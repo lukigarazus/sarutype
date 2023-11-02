@@ -1,7 +1,8 @@
 import {
-  CharStreamTokenizerCombinator,
-  StringFragmentCharStreamTokenizer,
-} from "../utils/CharStreamTokenizer";
+  SentenceConsumer,
+  WordConsumer,
+  CharConsumer,
+} from "./SentenceConsumer";
 import { Char } from "./Char";
 import { Sentence } from "./Sentence";
 
@@ -49,36 +50,33 @@ export const sentenceDisplayFromSentenceModel = (sentenceModel: Sentence) => {
   };
 };
 
-export const sentenceDisplayFromSentenceCharStreamTokenizerAndSentenceModel = (
-  sentenceTokenizer: CharStreamTokenizerCombinator,
-  sentence: Sentence,
+export const sentenceDisplayFromSentenceConsumer = (
+  sentenceConsumer: SentenceConsumer,
 ): SentenceDisplay => {
   return {
-    words: sentence.words.map((word, i) => {
-      const wordTokenizer = sentenceTokenizer.getTokenizer(
-        i,
-      ) as CharStreamTokenizerCombinator;
+    words: sentenceConsumer.wordConsumers.map((wordConsumer) => {
+      const wordState = wordConsumer.state;
       return {
-        chars: word.chars.map((char, j) => {
-          const charTokenizer = wordTokenizer.getTokenizer(
-            j,
-          ) as StringFragmentCharStreamTokenizer;
+        chars: wordConsumer.charConsumers.map((charConsumer) => {
+          const charState = charConsumer.state;
           return {
-            char,
-            isWrong: charTokenizer.satisfied === "satisfied with error",
-            isCorrect: charTokenizer.satisfied === "satisfied",
-            isActive:
-              charTokenizer === wordTokenizer.getFirstUnsatisfiedTokenizer(),
+            char: charConsumer.char,
+            isWrong:
+              charState.kind === "finished" && charState.type === "incorrect",
+            isCorrect:
+              charState.kind === "finished" && charState.type === "correct",
+            isActive: charState.kind === "active",
             showRomaji: false,
             isAdditional: false,
           };
         }),
-        isActive:
-          sentenceTokenizer.getFirstUnsatisfiedTokenizer() === wordTokenizer,
-        isWrong: wordTokenizer.satisfied === "satisfied with error",
-        isCorrect: wordTokenizer.satisfied === "satisfied",
+        isActive: wordState.kind === "active",
+        isWrong:
+          wordState.kind === "finished" && wordState.type === "incorrect",
+        isCorrect:
+          wordState.kind === "finished" && wordState.type === "correct",
       };
     }),
-    finished: sentenceTokenizer.satisfied !== "unsatisfied",
+    finished: sentenceConsumer.state.kind === "finished",
   };
 };

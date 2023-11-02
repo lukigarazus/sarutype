@@ -108,7 +108,7 @@ export abstract class StringEntityConsumer {
 }
 
 export class CharConsumer extends StringEntityConsumer {
-  constructor(private char: Char) {
+  constructor(public char: Char) {
     super();
   }
 
@@ -123,9 +123,9 @@ export class CharConsumer extends StringEntityConsumer {
 }
 
 export class WordConsumer extends StringEntityConsumer {
-  private charConsumers: CharConsumer[] = [];
+  public charConsumers: CharConsumer[] = [];
 
-  constructor(private word: Word) {
+  constructor(public word: Word) {
     super();
     this.charConsumers = word.chars.map((char) => new CharConsumer(char));
   }
@@ -260,9 +260,9 @@ export class WordConsumer extends StringEntityConsumer {
 }
 
 export class SentenceConsumer extends StringEntityConsumer {
-  private wordConsumers: WordConsumer[] = [];
+  public wordConsumers: WordConsumer[] = [];
 
-  constructor(private sentence: Sentence) {
+  constructor(public sentence: Sentence) {
     super();
     this.wordConsumers = sentence.words.map((word) => new WordConsumer(word));
   }

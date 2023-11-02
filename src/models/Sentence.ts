@@ -1,10 +1,4 @@
-import {
-  CharStreamTokenizer,
-  CharStreamTokenizerCombinator,
-  DelimiterCharStreamTokenizer,
-  StringFragmentCharStreamTokenizer,
-  WhitespacesCharStreamTokenizer,
-} from "../utils/CharStreamTokenizer";
+import { SentenceConsumer } from "./SentenceConsumer";
 import { Word, wordToStringHiragana, wordToStringRomaji } from "./Word";
 
 export type Sentence = {
@@ -23,14 +17,6 @@ export const sentenceToStringRomaji = (sentence: Sentence): string => {
   return sentence.words.map((word) => wordToStringRomaji(word)).join(" ");
 };
 
-export const charStreamTokenizerFromSentence = (sentence: Sentence) => {
-  const wordTokenizers = sentence.words.map((word) => {
-    const charTokenizers: CharStreamTokenizer[] = word.chars.map((char) => {
-      return new StringFragmentCharStreamTokenizer(char.romaji);
-    });
-    charTokenizers.push(new WhitespacesCharStreamTokenizer());
-    charTokenizers.push(new DelimiterCharStreamTokenizer(" "));
-    return new CharStreamTokenizerCombinator(charTokenizers);
-  });
-  return new CharStreamTokenizerCombinator(wordTokenizers);
+export const sentenceConsumerFromSentence = (sentence: Sentence) => {
+  return new SentenceConsumer(sentence);
 };

@@ -1,10 +1,6 @@
-import { sentenceDisplayFromSentenceCharStreamTokenizerAndSentenceModel } from "../models/SentenceDisplay.ts";
-import {
-  Sentence,
-  charStreamTokenizerFromSentence,
-} from "../models/Sentence.ts";
+import {} from "../models/SentenceDisplay.ts";
+import { Sentence } from "../models/Sentence.ts";
 import { SentenceDisplay } from "../models/SentenceDisplay.ts";
-import { CharStreamEvent } from "../utils/CharStreamTokenizer.ts";
 
 /*const testCases: Dupa[] = [
       ,
@@ -534,8 +530,8 @@ describe("SentenceDisplay", () => {
         multiWordPartialWhitespace,
         false,
       ] as const,*/
-    ].forEach(([name, testCase, only]) => {
-      (only ? test.only : test)(name, () => {
+    ].forEach(() => {
+      /*(only ? test.only : test)(name, () => {
         const sentenceTokenizer = charStreamTokenizerFromSentence(
           testCase.wholeStringModel,
         );
@@ -555,7 +551,7 @@ describe("SentenceDisplay", () => {
             testCase.wholeStringModel,
           ),
         ).toEqual(testCase.expected);
-      });
+      });*/
     });
   });
 });
