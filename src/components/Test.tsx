@@ -60,7 +60,7 @@ export const TestComponent = () => {
   const { options } = useOptions();
 
   const sentence = options.displaySignSystem.getRandomSentence(
-    10,
+    options.numberOfWordsPerTest,
     options.displaySignSystem.allowedDisplaySigns,
   );
 

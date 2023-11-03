@@ -29,6 +29,7 @@ type HiraganaDisplay = {
 
 export type Options = {
   showTransliterationTimeout: number;
+  numberOfWordsPerTest: number;
 
   inputSignSystem: AvailableInputSignsystems;
 
@@ -37,6 +38,7 @@ export type Options = {
 
 export const defaultOptions: Options = {
   showTransliterationTimeout: 5000,
+  numberOfWordsPerTest: 10,
 
   inputSignSystem: "roman",
 

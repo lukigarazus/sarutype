@@ -99,6 +99,19 @@ export const OptionsPanel = () => {
           }
         />
       </div>
+      <div>
+        <label>How many words per test should we show?</label>
+        <input
+          type="number"
+          value={options.numberOfWordsPerTest}
+          onChange={(ev) =>
+            setOptions({
+              ...options,
+              numberOfWordsPerTest: +ev.target.value,
+            })
+          }
+        />
+      </div>
     </div>
   );
 };

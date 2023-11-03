@@ -13,6 +13,7 @@ export type Persistence = {
 
 type PersistedOptions = {
   showTransliterationTimeout: number;
+  numberOfWordsPerTest: number;
   inputSignSystem: string;
   displaySignSystem: {
     kind: string;
@@ -23,6 +24,7 @@ type PersistedOptions = {
 const optionsToPersistedOptions = (options: Options): PersistedOptions => {
   return {
     showTransliterationTimeout: options.showTransliterationTimeout,
+    numberOfWordsPerTest: options.numberOfWordsPerTest,
     inputSignSystem: options.inputSignSystem,
     displaySignSystem: {
       kind: options.displaySignSystem.kind,
@@ -48,12 +50,20 @@ const persistedOptionsToOptions = (options: PersistedOptions): Options => {
     },
     withDisplay,
   );
-  return withDisplaySigns;
+  const withTimeout = {
+    ...withDisplaySigns,
+    showTransliterationTimeout: options.showTransliterationTimeout,
+  };
+  const withNumberOfWords = {
+    ...withTimeout,
+    numberOfWordsPerTest:
+      options.numberOfWordsPerTest ?? defaultOptions.numberOfWordsPerTest,
+  };
+  return withNumberOfWords;
 };
 
 export const localStoragePersistence: Persistence = {
   getOptions: async () => {
-    console.log("getOptions");
     const optionsFromStorage = localStorage.getItem("options");
     if (optionsFromStorage) {
       const options: PersistedOptions = JSON.parse(optionsFromStorage);
@@ -61,7 +71,6 @@ export const localStoragePersistence: Persistence = {
       console.log("getOptions", res);
       return res;
     }
-    console.log("getOptions default", defaultOptions);
     return defaultOptions;
   },
   setOptions: async (options) => {

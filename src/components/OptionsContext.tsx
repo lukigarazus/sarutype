@@ -38,7 +38,6 @@ export const OptionsProvider: ComponentType<PropsWithChildren> = ({
     persistence
       .getOptions()
       .then((options) => {
-        console.log("options", options);
         _setOptions(options);
         setLoading(false);
       })
@@ -55,7 +54,6 @@ export const OptionsProvider: ComponentType<PropsWithChildren> = ({
     }),
     [options, setOptions, loading],
   );
-  console.log("value", value);
 
   return (
     <OptionsContext.Provider value={value}>{children}</OptionsContext.Provider>
