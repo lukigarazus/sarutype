@@ -1,31 +1,29 @@
-import { ChangeEvent } from "react";
-import { resultUnsafeUnwrap } from "./types/Result";
-import { getRandomSentence } from "./utils/language/words";
+import { TestComponent } from "./components/Test";
+import { OptionsPanel } from "./components/OptionsPanel";
+import { useOptions } from "./hooks/useOptions";
+
 /*<SentenceComponent
           onFocus={() => {
             console.log("focus");
           }}
           sentence={sentence}
         />*/
+
 function App() {
-  const sentence = resultUnsafeUnwrap(getRandomSentence(10));
+  const { loading: optionsLoading } = useOptions();
+  console.log("RENDER", optionsLoading);
   return (
     <>
       <h1>Sarutype</h1>
       <main>
-        <input
-          onChange={(ev: ChangeEvent<HTMLInputElement>) => {
-            switch (ev.nativeEvent.type) {
-              case "input": {
-                const nativeEvent = ev.nativeEvent as InputEvent;
-                console.log({
-                  key: nativeEvent.data,
-                  timestamp: nativeEvent.timeStamp,
-                });
-              }
-            }
-          }}
-        />
+        {!optionsLoading ? (
+          <>
+            <TestComponent />
+            <OptionsPanel />
+          </>
+        ) : (
+          <div>Loading options...</div>
+        )}
       </main>
     </>
   );

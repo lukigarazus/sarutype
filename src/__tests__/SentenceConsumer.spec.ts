@@ -635,4 +635,38 @@ describe("SentenceConsumer", () => {
     });
     expect(sentenceConsumer.toString()).toEqual("  resu   maki");
   });
+
+  it.skip("should handle remove on word end without a space", () => {
+    sentenceConsumer.focus();
+    sentenceConsumer.consumeChangeEvent({
+      char: "r",
+      timestamp: 0,
+      kind: "add",
+    });
+    sentenceConsumer.consumeChangeEvent({
+      char: "e",
+      timestamp: 0,
+      kind: "add",
+    });
+    sentenceConsumer.consumeChangeEvent({
+      char: "s",
+      timestamp: 0,
+      kind: "add",
+    });
+    sentenceConsumer.consumeChangeEvent({
+      char: "u",
+      timestamp: 0,
+      kind: "add",
+    });
+    sentenceConsumer.consumeChangeEvent({
+      timestamp: 0,
+      kind: "remove",
+    });
+    expect(sentenceConsumer.state).toEqual({
+      kind: "active",
+    });
+    expect(sentenceConsumer.wordConsumers[0].charConsumers[1].state).toEqual({
+      kind: "active",
+    });
+  });
 });

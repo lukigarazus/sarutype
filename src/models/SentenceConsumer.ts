@@ -62,6 +62,7 @@ export abstract class StringEntityConsumer {
     return stringEntityChangeEventsToString(this.events);
   }
   public focus() {
+    console.log("CharConsumer focus");
     this.state = { kind: "active" };
   }
   public blur() {
@@ -78,6 +79,7 @@ export abstract class StringEntityConsumer {
   abstract checkState(): StringEntityConsumerState;
 
   consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
+    console.log("CharConsumer consumeChangeEvent", event);
     switch (event.kind) {
       case "add": {
         if (this.state.kind === "finished") {
@@ -116,7 +118,7 @@ export class CharConsumer extends StringEntityConsumer {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
     return stringFromEvents === this.char.romaji
       ? { kind: "finished", type: "correct" }
-      : stringFromEvents.length === this.char.romaji.length
+      : stringFromEvents.length >= this.char.romaji.length
       ? { kind: "finished", type: "incorrect" }
       : { kind: "active" };
   }
@@ -131,6 +133,7 @@ export class WordConsumer extends StringEntityConsumer {
   }
 
   focus() {
+    console.log("WordConsumer focus");
     const firstCharConsumer = this.charConsumers[0];
     firstCharConsumer.focus();
     this.state = { kind: "active" };
@@ -210,6 +213,7 @@ export class WordConsumer extends StringEntityConsumer {
   }
 
   consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
+    console.log("WordConsumer consumeChangeEvent", event);
     const wordString = stringEntityChangeEventsToString(this.events);
     switch (event.kind) {
       case "add":
@@ -320,9 +324,10 @@ export class SentenceConsumer extends StringEntityConsumer {
   private pipeEventToWordConsumers(
     event: StringEntityChangeEvent,
   ): ConsumtionResult {
+    console.log("SentenceConsumer pipeEventToWordConsumers");
     const currentWordConsumerIndex = this.getCurrentWordConsumerIndex();
     const currentWordConsumer = this.wordConsumers[currentWordConsumerIndex];
-    console.log("currentWordConsumer 2", currentWordConsumer);
+    console.log("currentWordConsumer", currentWordConsumer);
 
     if (!currentWordConsumer) return { kind: "go forward" };
 
@@ -331,7 +336,6 @@ export class SentenceConsumer extends StringEntityConsumer {
       case "success":
         return { kind: "success", value: this.state };
       case "go back":
-        console.log("go back 3");
         if (currentWordConsumerIndex === 0) return { kind: "go back" };
         else {
           const previousWordConsumer =
@@ -361,8 +365,10 @@ export class SentenceConsumer extends StringEntityConsumer {
   }
 
   consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
+    console.log("SentenceConsumer consumeChangeEvent", event);
     switch (event.kind) {
       case "add": {
+        console.log("SentenceConsumer consumeChangeEvent add");
         this.events.push(event);
         const result = this.pipeEventToWordConsumers(event);
         switch (result.kind) {
@@ -387,7 +393,6 @@ export class SentenceConsumer extends StringEntityConsumer {
       }
       // eslint-disable-next-line no-fallthrough
       case "remove": {
-        console.log("remove 1");
         const pipeResult = this.pipeEventToWordConsumers(event);
         switch (pipeResult.kind) {
           case "success":

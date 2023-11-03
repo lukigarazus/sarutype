@@ -24,16 +24,15 @@ export const getRandomSentence = (
 export const getRandomWord = (
   allowedChars?: Set<string>,
 ): Result<Word, string> => {
-  const element = randomElement(
-    DBWords.filter((word) => {
-      if (!allowedChars) return true;
-      const chars = word.hiragana.split("");
-      const isAllowed = chars.every((char) => allowedChars.has(char));
-      return isAllowed;
-    }),
-  );
+  const allowedWords = DBWords.filter((word) => {
+    if (!allowedChars) return true;
+    const chars = word.hiragana.split("");
+    const isAllowed = chars.every((char) => allowedChars.has(char));
+    return isAllowed;
+  });
+  const element = randomElement(allowedWords);
   if (!element) return { kind: "error", error: "No words found" };
-  return { kind: "ok", value: DBWordToWord(randomElement(DBWords)) };
+  return { kind: "ok", value: DBWordToWord(element) };
 };
 
 const isDBWordValid = (dbWord: DBWord) => {

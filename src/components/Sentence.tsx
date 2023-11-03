@@ -1,14 +1,34 @@
+import { useEffect, useRef, useState } from "react";
 import {
   CharDisplay,
   SentenceDisplay,
   WordDisplay,
 } from "../models/SentenceDisplay";
+import { useOptions } from "../hooks/useOptions";
 
 const CharComponent = ({
-  char: { char, isActive: showCursor, isWrong, isCorrect, showRomaji },
+  char: { char, isActive, isWrong, isCorrect, showRomaji },
 }: {
   char: CharDisplay;
 }) => {
+  const {
+    options: { showTransliterationTimeout },
+  } = useOptions();
+  const [showRomajiLocal, setShowRomajiLocal] = useState(false);
+  const timeout = useRef<number | null>(null);
+  useEffect(() => {
+    if (isActive) {
+      timeout.current = window.setTimeout(() => {
+        setShowRomajiLocal(true);
+      }, showTransliterationTimeout);
+    } else {
+      setShowRomajiLocal(false);
+      if (timeout.current !== null) {
+        window.clearTimeout(timeout.current);
+        timeout.current = null;
+      }
+    }
+  }, [isActive, showTransliterationTimeout]);
   return (
     <div
       style={{
@@ -19,12 +39,18 @@ const CharComponent = ({
     >
       <span
         style={{
-          color: isWrong ? "red" : isCorrect ? "green" : "white",
+          color: isWrong
+            ? "red"
+            : isCorrect
+            ? "white"
+            : isActive
+            ? "yellow"
+            : "grey",
         }}
       >
         {char.hiragana}
       </span>
-      {showRomaji && <span>{char.romaji}</span>}
+      {(showRomaji || showRomajiLocal) && <span>{char.romaji}</span>}
     </div>
   );
 };
