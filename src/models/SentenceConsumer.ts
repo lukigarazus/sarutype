@@ -8,9 +8,6 @@ type ConsumtionResult =
       value: StringEntityConsumerState;
     }
   | {
-      kind: "go back";
-    }
-  | {
       kind: "go forward";
     }
   | {
@@ -26,6 +23,10 @@ export type StringEntityChangeEvent =
     }
   | {
       kind: "remove";
+      timestamp: number;
+    }
+  | {
+      kind: "focus";
       timestamp: number;
     };
 
@@ -48,7 +49,7 @@ export const stringEntityChangeEventsToString = (
 
   for (const event of events) {
     if (event.kind === "add") stringArray.push(event.char);
-    else stringArray.pop();
+    else if (event.kind === "remove") stringArray.pop();
   }
 
   return stringArray.join("");
@@ -57,6 +58,12 @@ export const stringEntityChangeEventsToString = (
 export abstract class StringEntityConsumer {
   protected events: StringEntityChangeEvent[] = [];
 
+  public time(): number {
+    return (
+      (this.events[this.events.length - 1]?.timestamp ?? 0) -
+      (this.events[0]?.timestamp ?? 0)
+    );
+  }
   public state: StringEntityConsumerState = { kind: "inactive" };
   public toString() {
     return stringEntityChangeEventsToString(this.events);
@@ -64,6 +71,10 @@ export abstract class StringEntityConsumer {
   public focus() {
     console.log("CharConsumer focus");
     this.state = { kind: "active" };
+    this.events.push({
+      kind: "focus",
+      timestamp: Date.now(),
+    });
   }
   public blur() {
     this.state = { kind: "inactive" };
@@ -95,15 +106,13 @@ export abstract class StringEntityConsumer {
       }
       case "remove": {
         if (this.toString() === "") {
-          return { kind: "go back" };
+          return { kind: "success", value: this.state };
         }
         this.events.push(event);
         const satisfactionState = this.checkState();
         this.state = satisfactionState;
 
-        return this.toString() === ""
-          ? { kind: "go back" }
-          : { kind: "success", value: this.state };
+        return { kind: "success", value: this.state };
       }
     }
   }
@@ -148,6 +157,12 @@ export class WordConsumer extends StringEntityConsumer {
     this.charConsumers.forEach((charConsumer) => charConsumer.reset());
   };
 
+  toString() {
+    return this.charConsumers
+      .map((charConsumer) => charConsumer.toString())
+      .join("");
+  }
+
   // this should only be called when the word is considered complete
   checkState(): StringEntityConsumerState {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
@@ -159,6 +174,13 @@ export class WordConsumer extends StringEntityConsumer {
   }
 
   finalize(): StringEntityConsumerState {
+    this.charConsumers.forEach((charConsumer) =>
+      charConsumer.state.kind === "finished"
+        ? undefined
+        : charConsumer.state.kind === "active"
+        ? (charConsumer.state = { kind: "finished", type: "incorrect" })
+        : undefined,
+    );
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
     return stringFromEvents === wordToStringRomaji(this.word)
       ? { kind: "finished", type: "correct" }
@@ -183,18 +205,6 @@ export class WordConsumer extends StringEntityConsumer {
     switch (result.kind) {
       case "success":
         return { kind: "success", value: this.state };
-      case "go back":
-        if (currentCharConsumerIndex === 0) return { kind: "go back" };
-        else {
-          const previousCharConsumer =
-            this.charConsumers[currentCharConsumerIndex - 1];
-          currentCharConsumer.blur();
-          previousCharConsumer.focus();
-          return {
-            kind: "success",
-            value: this.state,
-          };
-        }
       case "go forward":
         if (currentCharConsumerIndex === this.charConsumers.length - 1)
           return { kind: "go forward" };
@@ -233,8 +243,6 @@ export class WordConsumer extends StringEntityConsumer {
             switch (result.kind) {
               case "success":
                 return { kind: "success", value: this.state };
-              case "go back":
-                throw new Error("[unreachable] go back on add");
               case "go forward":
                 // adding additional characters to a word that has all chars consumed
                 return { kind: "success", value: this.state };
@@ -250,8 +258,6 @@ export class WordConsumer extends StringEntityConsumer {
           case "success":
             this.events.push(event);
             return { kind: "success", value: this.state };
-          case "go back":
-            return { kind: "go back" };
           case "go forward":
             throw new Error("[unreachable] go forward on remove");
           case "error":
@@ -296,6 +302,12 @@ export class SentenceConsumer extends StringEntityConsumer {
     this.wordConsumers.forEach((wordConsumer) => wordConsumer.reset());
   };
 
+  toString() {
+    return this.wordConsumers
+      .map((wordConsumer) => wordConsumer.toString())
+      .join(" ");
+  }
+
   finalize(): void {
     const lastWordConsumer = this.wordConsumers[this.wordConsumers.length - 1];
     lastWordConsumer.consumeChangeEvent({
@@ -335,18 +347,6 @@ export class SentenceConsumer extends StringEntityConsumer {
     switch (result.kind) {
       case "success":
         return { kind: "success", value: this.state };
-      case "go back":
-        if (currentWordConsumerIndex === 0) return { kind: "go back" };
-        else {
-          const previousWordConsumer =
-            this.wordConsumers[currentWordConsumerIndex - 1];
-          currentWordConsumer.blur();
-          previousWordConsumer.focus();
-          return {
-            kind: "success",
-            value: this.state,
-          };
-        }
       case "go forward":
         if (currentWordConsumerIndex === this.wordConsumers.length - 1)
           return { kind: "go forward" };
@@ -383,8 +383,6 @@ export class SentenceConsumer extends StringEntityConsumer {
             }
             return { kind: "success", value: this.state };
           }
-          case "go back":
-            throw new Error("[unreachable] go back on add");
           case "go forward":
             return { kind: "go forward" };
           case "error":
@@ -398,8 +396,6 @@ export class SentenceConsumer extends StringEntityConsumer {
           case "success":
             this.events.push(event);
             return { kind: "success", value: this.state };
-          case "go back":
-            return { kind: "go back" };
           case "go forward":
             throw new Error("[unreachable] go forward on remove");
           case "error":

@@ -1,10 +1,41 @@
-import { useMemo, useState, ChangeEvent, useEffect } from "react";
+import {
+  useMemo,
+  useState,
+  ChangeEvent,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
+import { useHotkeys } from "react-hotkeys-hook";
+
 import { Sentence, sentenceConsumerFromSentence } from "../models/Sentence";
 import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
+import {
+  charPerformanceToCharPerformanceHistory,
+  sentenceConsumerToCharPerformance,
+} from "../models/CharPerformance";
+import { useCharPerformanceHistory } from "./CharPerformanceHistoryContext";
 
-const TestSentenceComponent = ({ sentence }: { sentence: Sentence }) => {
+const TestSentenceComponent = ({
+  sentence,
+  reset,
+}: {
+  sentence: Sentence;
+  reset: () => void;
+}) => {
+  const { options } = useOptions();
+  const { charPerformanceHistory, setCharPerformanceHistory } =
+    useCharPerformanceHistory();
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const resetRef = useRef<HTMLButtonElement | null>(null);
+
+  useHotkeys("tab", () => {
+    resetRef.current?.focus();
+  });
+
   const sentenceConsumer = useMemo(
     () => sentenceConsumerFromSentence(sentence),
     [sentence],
@@ -15,21 +46,64 @@ const TestSentenceComponent = ({ sentence }: { sentence: Sentence }) => {
   const refresh = () => {
     setSentenceDisplay(sentenceDisplayFromSentenceConsumer(sentenceConsumer));
   };
+  const startTest = () => {
+    if (sentenceConsumer.state.kind === "finished") return;
+    sentenceConsumer.focus();
+    inputRef.current?.focus();
+    refresh();
+  };
+  const checkTestEnd = useCallback(() => {
+    if (inputRef.current && sentenceConsumer.state.kind === "finished") {
+      inputRef.current.blur();
+      inputRef.current.value = "";
+
+      const newCharPerformance = charPerformanceToCharPerformanceHistory(
+        sentenceConsumerToCharPerformance(
+          sentenceConsumer,
+          options.displaySignSystem.kind,
+          // this is a hack, the first one is always a lot slower and messes up the stats
+        ).slice(1),
+        JSON.parse(JSON.stringify(charPerformanceHistory)),
+      );
+      console.log("FINISHED", newCharPerformance);
+
+      //setCharPerformanceHistory(newCharPerformance);
+    }
+  }, [
+    options.displaySignSystem.kind,
+    sentenceConsumer,
+    charPerformanceHistory,
+    setCharPerformanceHistory,
+  ]);
 
   useEffect(() => {
     setSentenceDisplay(sentenceDisplayFromSentenceConsumer(sentenceConsumer));
   }, [sentenceConsumer]);
+
+  useEffect(() => {
+    checkTestEnd();
+  }, [sentenceDisplay, checkTestEnd]);
   return (
     <div>
       <input
+        style={{
+          border: "none",
+          cursor: "default",
+          outline: "none",
+          opacity: 0,
+          padding: 0,
+          resize: "none",
+          zIndex: -1,
+          margin: "0 auto",
+          position: "absolute",
+        }}
+        tabIndex={1}
+        ref={inputRef}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck="false"
-        onFocus={() => {
-          sentenceConsumer.focus();
-          refresh();
-        }}
+        onFocus={startTest}
         onChange={(ev: ChangeEvent<HTMLInputElement>) => {
           switch (ev.nativeEvent.type) {
             case "input": {
@@ -38,35 +112,109 @@ const TestSentenceComponent = ({ sentence }: { sentence: Sentence }) => {
                 nativeEvent.data === null
                   ? ({
                       kind: "remove",
-                      timestamp: nativeEvent.timeStamp,
+                      timestamp: Date.now(),
                     } as const)
                   : ({
                       kind: "add",
                       char: nativeEvent.data,
-                      timestamp: nativeEvent.timeStamp,
+                      timestamp: Date.now(),
                     } as const);
-              sentenceConsumer.consumeChangeEvent(event);
-              refresh();
+              if (sentenceConsumer.state.kind !== "finished") {
+                sentenceConsumer.consumeChangeEvent(event);
+                refresh();
+              }
             }
           }
         }}
       />
-      <SentenceComponent sentence={sentenceDisplay} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            position: "relative",
+            width: 700,
+            height: 300,
+            overflowY: "auto",
+            border: "1px solid black",
+            borderRadius: "0.5em",
+            padding: "0.5em",
+          }}
+          onClick={startTest}
+        >
+          {sentenceConsumer.state.kind === "finished" && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 1,
+              }}
+            >
+              Finished
+            </div>
+          )}
+          <SentenceComponent sentence={sentenceDisplay} />
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          width: "100%",
+          marginTop: "1em",
+        }}
+      >
+        <button
+          ref={resetRef}
+          style={{
+            background: "none",
+            border: "none",
+          }}
+          onClick={reset}
+          tabIndex={1}
+        >
+          Reset
+        </button>
+      </div>
     </div>
   );
 };
 
 export const TestComponent = () => {
   const { options } = useOptions();
+  console.log(options);
 
-  const sentence = options.displaySignSystem.getRandomSentence(
-    options.numberOfWordsPerTest,
-    options.displaySignSystem.allowedDisplaySigns,
+  const [sentence, setSentence] = useState(
+    options.displaySignSystem.getRandomSentence(
+      options.numberOfWordsPerTest,
+      options.displaySignSystem.allowedDisplaySigns,
+    ),
   );
+
+  const reset = () => {
+    setSentence(
+      options.displaySignSystem.getRandomSentence(
+        options.numberOfWordsPerTest,
+        options.displaySignSystem.allowedDisplaySigns,
+      ),
+    );
+  };
 
   return sentence.kind === "error" ? (
     <div>Error while getting a sentence: {sentence.error}</div>
   ) : (
-    <TestSentenceComponent sentence={sentence.value} />
+    <TestSentenceComponent sentence={sentence.value} reset={reset} />
   );
 };

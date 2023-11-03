@@ -11,6 +11,7 @@ const CharComponent = ({
 }: {
   char: CharDisplay;
 }) => {
+  const elementRef = useRef<HTMLSpanElement | null>(null);
   const {
     options: { showTransliterationTimeout },
   } = useOptions();
@@ -21,6 +22,10 @@ const CharComponent = ({
       timeout.current = window.setTimeout(() => {
         setShowRomajiLocal(true);
       }, showTransliterationTimeout);
+      elementRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
     } else {
       setShowRomajiLocal(false);
       if (timeout.current !== null) {
@@ -30,7 +35,8 @@ const CharComponent = ({
     }
   }, [isActive, showTransliterationTimeout]);
   return (
-    <div
+    <span
+      ref={elementRef}
       style={{
         display: "inline-flex",
         flexDirection: "column",
@@ -46,12 +52,13 @@ const CharComponent = ({
             : isActive
             ? "yellow"
             : "grey",
+          marginBottom: showRomaji || showRomajiLocal ? 0 : 24,
         }}
       >
         {char.hiragana}
       </span>
       {(showRomaji || showRomajiLocal) && <span>{char.romaji}</span>}
-    </div>
+    </span>
   );
 };
 
@@ -60,6 +67,9 @@ const WordComponent = ({ word }: { word: WordDisplay }) => {
     <span
       style={{
         marginRight: "1em",
+        display: "inline-flex",
+        flexDirection: "row",
+        flexWrap: "nowrap",
       }}
     >
       {word.chars.map((char) => (
@@ -70,30 +80,14 @@ const WordComponent = ({ word }: { word: WordDisplay }) => {
 };
 export const SentenceComponent = ({
   sentence,
-  width = 700,
-  height = 300,
-  onFocus,
-  onBlur,
 }: {
   sentence: SentenceDisplay;
-  width?: number;
-  height?: number;
-  onFocus?: () => void;
-  onBlur?: () => void;
 }) => {
   return (
-    <div
-      style={{
-        width,
-        height,
-        display: "inline-block",
-      }}
-      onFocus={onFocus}
-      onBlur={onBlur}
-    >
+    <>
       {sentence.words.map((word) => (
         <WordComponent word={word} />
       ))}
-    </div>
+    </>
   );
 };

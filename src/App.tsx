@@ -1,6 +1,7 @@
 import { TestComponent } from "./components/Test";
 import { OptionsPanel } from "./components/OptionsPanel";
 import { useOptions } from "./hooks/useOptions";
+import { StatsPanel } from "./components/StatsPanel";
 
 function App() {
   const { loading: optionsLoading } = useOptions();
@@ -12,6 +13,7 @@ function App() {
           <>
             <TestComponent />
             <OptionsPanel />
+            <StatsPanel />
           </>
         ) : (
           <div>Loading options...</div>

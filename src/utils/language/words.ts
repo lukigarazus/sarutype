@@ -2,6 +2,7 @@ import { Sentence, makeSentence } from "../../models/Sentence";
 import { Word, wordFromRomaji, wordToStringHiragana } from "../../models/Word";
 import { Result, catResult } from "../../types/Result";
 import { randomElement, arrayOfLength } from "../array";
+import { hiraganaToRomanji } from "./hiragana";
 
 export const getRandomSentence = (
   length: number,
@@ -3556,4 +3557,12 @@ const DBWords: DBWord[] = [
     romaji: "mo",
     wholeText: "も – too, also (mo)",
   },
-].filter(isDBWordValid);
+]
+  .concat(
+    Object.entries(hiraganaToRomanji).map(([hiragana, romaji]) => ({
+      hiragana,
+      romaji,
+      wholeText: `${hiragana}、${romaji} - ${romaji} - ${hiragana}`,
+    })),
+  )
+  .filter(isDBWordValid);

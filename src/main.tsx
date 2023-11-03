@@ -5,6 +5,7 @@ import { OptionsProvider } from "./components/OptionsContext.tsx";
 import { PersistenceProvider } from "./components/PersistenceContext.tsx";
 
 import "./index.css";
+import { CharPerformanceHistoryProvider } from "./components/CharPerformanceHistoryContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

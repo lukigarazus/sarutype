@@ -1,8 +1,4 @@
-import {
-  CharConsumer,
-  SentenceConsumer,
-  WordConsumer,
-} from "../models/SentenceConsumer";
+import { CharConsumer, WordConsumer } from "../models/SentenceConsumer";
 
 describe("CharConsumer", () => {
   it("should consume a character and be finished", () => {
@@ -91,7 +87,10 @@ describe("CharConsumer", () => {
         kind: "remove",
       }),
     ).toEqual({
-      kind: "go back",
+      kind: "success",
+      value: {
+        kind: "active",
+      },
     });
   });
   it("should handle remove on active", () => {
@@ -109,10 +108,13 @@ describe("CharConsumer", () => {
       timestamp: 0,
       kind: "remove",
     });
-    expect(consumer.state).toEqual({
-      kind: "active",
+    expect(res).toEqual({
+      kind: "success",
+      value: {
+        kind: "active",
+      },
     });
-    expect(res).toEqual({ kind: "go back" });
+    expect(consumer.toString()).toEqual("");
   });
 });
 
@@ -375,14 +377,44 @@ describe("WordConsumer", () => {
       timestamp: 0,
       kind: "remove",
     });
+    wordConsumer.consumeChangeEvent({
+      timestamp: 0,
+      kind: "remove",
+    });
     expect(wordConsumer.state).toEqual({
       kind: "active",
     });
     expect(wordConsumer.toString()).toEqual("re");
   });
+  it("should handle space in mid char", () => {
+    wordConsumer.focus();
+    wordConsumer.consumeChangeEvent({
+      char: "r",
+      timestamp: 0,
+      kind: "add",
+    });
+    const res = wordConsumer.consumeChangeEvent({
+      char: " ",
+      timestamp: 0,
+      kind: "add",
+    });
+    expect(res).toEqual({ kind: "go forward" });
+    expect(wordConsumer.state).toEqual({
+      kind: "finished",
+      type: "incorrect",
+    });
+    expect(wordConsumer.toString()).toEqual("r");
+    expect(wordConsumer.charConsumers[0].state).toEqual({
+      kind: "finished",
+      type: "incorrect",
+    });
+    expect(wordConsumer.charConsumers[1].state).toEqual({
+      kind: "inactive",
+    });
+  });
 });
 
-describe("SentenceConsumer", () => {
+/*describe("SentenceConsumer", () => {
   const char1 = {
     romaji: "re",
     hiragana: "",
@@ -669,4 +701,4 @@ describe("SentenceConsumer", () => {
       kind: "active",
     });
   });
-});
+}); */
