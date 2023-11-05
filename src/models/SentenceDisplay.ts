@@ -13,6 +13,8 @@ export type CharDisplay = {
   isActive: boolean;
   showRomaji: boolean;
   isAdditional: boolean;
+  underlying?: string;
+  showUnderlying?: boolean;
 };
 
 export type WordDisplay = {
@@ -39,6 +41,8 @@ export const sentenceDisplayFromSentenceModel = (sentenceModel: Sentence) => {
             isActive: false,
             showRomaji: false,
             isAdditional: false,
+            underlying: undefined,
+            showUnderlying: false,
           };
         }),
         isActive: false,
@@ -68,6 +72,8 @@ export const sentenceDisplayFromSentenceConsumer = (
             isActive: charState.kind === "active",
             showRomaji: false,
             isAdditional: false,
+            underlying: charConsumer.toString(),
+            showUnderlying: false,
           };
         }),
         isActive: wordState.kind === "active",

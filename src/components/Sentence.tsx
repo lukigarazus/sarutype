@@ -6,34 +6,53 @@ import {
 } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
 
+type BottomSlotState =
+  | { kind: "empty" }
+  | { kind: "error" }
+  | { kind: "active" }
+  | { kind: "hint" }
+  | { kind: "correct" }
+  | { kind: "finished" };
+
 const CharComponent = ({
-  char: { char, isActive, isWrong, isCorrect, showRomaji },
+  char: { char, isActive, isWrong, isCorrect, underlying },
 }: {
   char: CharDisplay;
 }) => {
   const elementRef = useRef<HTMLSpanElement | null>(null);
+
   const {
     options: { showTransliterationTimeout },
   } = useOptions();
-  const [showRomajiLocal, setShowRomajiLocal] = useState(false);
-  const timeout = useRef<number | null>(null);
+
+  const [bottomSlotState, setBottomSlotState] = useState<BottomSlotState>({
+    kind: "empty",
+  });
+
   useEffect(() => {
-    if (isActive) {
-      timeout.current = window.setTimeout(() => {
-        setShowRomajiLocal(true);
+    if (isActive)
+      setTimeout(() => {
+        setBottomSlotState((state) => {
+          if (state.kind === "empty") return { kind: "hint" };
+          return state;
+        });
       }, showTransliterationTimeout);
-      elementRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    } else {
-      setShowRomajiLocal(false);
-      if (timeout.current !== null) {
-        window.clearTimeout(timeout.current);
-        timeout.current = null;
-      }
-    }
   }, [isActive, showTransliterationTimeout]);
+
+  useEffect(() => {
+    if (isWrong) setBottomSlotState({ kind: "error" });
+    else if (isCorrect) setBottomSlotState({ kind: "correct" });
+    else if (underlying) setBottomSlotState({ kind: "active" });
+    else setBottomSlotState({ kind: "empty" });
+  }, [underlying, isWrong, isCorrect]);
+
+  useEffect(() => {
+    if (isCorrect || isWrong)
+      setTimeout(() => {
+        setBottomSlotState({ kind: "finished" });
+      }, 2000);
+  }, [isCorrect, isWrong]);
+
   return (
     <span
       ref={elementRef}
@@ -41,6 +60,8 @@ const CharComponent = ({
         display: "inline-flex",
         flexDirection: "column",
         padding: "0.3em",
+        position: "relative",
+        width: "calc(26px - 0.6em)",
       }}
     >
       <span
@@ -52,12 +73,51 @@ const CharComponent = ({
             : isActive
             ? "yellow"
             : "grey",
-          marginBottom: showRomaji || showRomajiLocal ? 0 : 24,
+          marginBottom:
+            bottomSlotState.kind !== "empty" &&
+            bottomSlotState.kind !== "finished"
+              ? 0
+              : 24,
         }}
       >
         {char.hiragana}
       </span>
-      {(showRomaji || showRomajiLocal) && <span>{char.romaji}</span>}
+      {bottomSlotState.kind === "error" && (
+        <span
+          style={{
+            color: "red",
+          }}
+        >
+          {char.romaji}
+        </span>
+      )}
+      {bottomSlotState.kind === "active" && (
+        <span
+          style={{
+            color: "yellow",
+          }}
+        >
+          {underlying}
+        </span>
+      )}
+      {bottomSlotState.kind === "hint" && (
+        <span
+          style={{
+            color: "grey",
+          }}
+        >
+          {char.romaji}
+        </span>
+      )}
+      {bottomSlotState.kind === "correct" && (
+        <span
+          style={{
+            color: "white",
+          }}
+        >
+          {char.romaji}
+        </span>
+      )}
     </span>
   );
 };

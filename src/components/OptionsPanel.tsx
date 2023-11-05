@@ -13,7 +13,7 @@ export const OptionsPanel = () => {
   return (
     <div>
       <div>
-        <label htmlFor="displaySigns">Display sign system</label>
+        <label htmlFor="displaySigns">I want to learn:</label>
         <select
           id="displaySignSystem"
           value={options.displaySignSystem.kind}
@@ -29,7 +29,7 @@ export const OptionsPanel = () => {
         </select>
       </div>
       <div>
-        <label htmlFor="inputSignSystem">Input sign system</label>
+        <label htmlFor="inputSignSystem">I type using:</label>
         <select
           id="inputSignSystem"
           value={options.inputSignSystem}
@@ -45,7 +45,9 @@ export const OptionsPanel = () => {
         </select>
       </div>
       <div>
-        <label htmlFor="displaySigns">Which signs do you want to learn?</label>
+        <label htmlFor="displaySigns">
+          I want to learn the following signs:
+        </label>
         <div
           style={{
             display: "flex",
@@ -87,7 +89,7 @@ export const OptionsPanel = () => {
         </div>
       </div>
       <div>
-        <label>How long should we wait before we show transliteration?</label>
+        <label>I want to be shown a hint after _ milliseconds:</label>
         <input
           type="number"
           value={options.showTransliterationTimeout}
@@ -100,7 +102,7 @@ export const OptionsPanel = () => {
         />
       </div>
       <div>
-        <label>How many words per test should we show?</label>
+        <label>I want a test to consist of _ words:</label>
         <input
           type="number"
           value={options.numberOfWordsPerTest}

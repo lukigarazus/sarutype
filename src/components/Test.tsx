@@ -47,7 +47,11 @@ const TestSentenceComponent = ({
     setSentenceDisplay(sentenceDisplayFromSentenceConsumer(sentenceConsumer));
   };
   const startTest = () => {
-    if (sentenceConsumer.state.kind === "finished") return;
+    if (
+      sentenceConsumer.state.kind === "finished" ||
+      sentenceConsumer.state.kind === "active"
+    )
+      return;
     sentenceConsumer.focus();
     inputRef.current?.focus();
     refresh();
