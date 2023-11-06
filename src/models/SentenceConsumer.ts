@@ -308,13 +308,14 @@ export class SentenceConsumer extends StringEntityConsumer {
       .join(" ");
   }
 
-  finalize(): void {
+  finalize(sendSpace = true): void {
     const lastWordConsumer = this.wordConsumers[this.wordConsumers.length - 1];
-    lastWordConsumer.consumeChangeEvent({
-      kind: "add",
-      char: " ",
-      timestamp: Date.now(),
-    });
+    if (sendSpace)
+      lastWordConsumer.consumeChangeEvent({
+        kind: "add",
+        char: " ",
+        timestamp: Date.now(),
+      });
     const isIncorrect = this.wordConsumers.some((wordConsumer) => {
       const state = wordConsumer.state;
       return state.kind === "finished" && state.type === "incorrect";
@@ -348,9 +349,10 @@ export class SentenceConsumer extends StringEntityConsumer {
       case "success":
         return { kind: "success", value: this.state };
       case "go forward":
-        if (currentWordConsumerIndex === this.wordConsumers.length - 1)
+        if (currentWordConsumerIndex === this.wordConsumers.length - 1) {
+          this.finalize(false);
           return { kind: "go forward" };
-        else {
+        } else {
           const nextWordConsumer =
             this.wordConsumers[currentWordConsumerIndex + 1];
           nextWordConsumer.focus();
