@@ -143,7 +143,6 @@ export class WordConsumer extends StringEntityConsumer {
   }
 
   focus() {
-    console.log("WordConsumer focus");
     const firstCharConsumer = this.charConsumers[0];
     firstCharConsumer.focus();
     this.state = { kind: "active" };
@@ -169,6 +168,8 @@ export class WordConsumer extends StringEntityConsumer {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
     return stringFromEvents === wordToStringRomaji(this.word)
       ? { kind: "finished", type: "correct" }
+      : stringFromEvents.length === wordToStringRomaji(this.word).length
+      ? { kind: "finished", type: "incorrect" }
       : this.state.kind === "inactive"
       ? { kind: "inactive" }
       : { kind: "active" };
@@ -378,7 +379,13 @@ export class SentenceConsumer extends StringEntityConsumer {
           case "success": {
             const lastWordConsumer =
               this.wordConsumers[this.wordConsumers.length - 1];
+            console.log(
+              "lastWordConsumer",
+              lastWordConsumer,
+              lastWordConsumer.checkState(),
+            );
             if (lastWordConsumer.checkState().kind === "finished") {
+              console.log("last word is finished", lastWordConsumer);
               this.finalize();
               // end sentence when the last word is finished
               // without a space
