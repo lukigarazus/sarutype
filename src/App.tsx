@@ -12,6 +12,13 @@ const router = createBrowserRouter([
     path: "/sarutype/options",
     element: <OptionsPage />,
   },
+  {
+    path: "/sarutype/stats",
+    lazy: async () => {
+      const Component = (await import("./pages/Stats")).default;
+      return { Component };
+    },
+  },
 ]);
 
 function App() {

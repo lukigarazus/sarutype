@@ -7,13 +7,15 @@ import { PersistenceProvider } from "./components/PersistenceContext.tsx";
 import "react-tooltip/dist/react-tooltip.css";
 
 import "./index.css";
-// import { CharPerformanceHistoryProvider } from "./components/CharPerformanceHistoryContext.tsx";
+import { CharPerformanceHistoryProvider } from "./components/CharPerformanceHistoryContext.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <PersistenceProvider>
       <OptionsProvider>
-        <App />
+        <CharPerformanceHistoryProvider>
+          <App />
+        </CharPerformanceHistoryProvider>
       </OptionsProvider>
     </PersistenceProvider>
   </React.StrictMode>,

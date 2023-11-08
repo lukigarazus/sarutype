@@ -1,6 +1,7 @@
 import { ComponentType, PropsWithChildren } from "react";
 import { BsFillKeyboardFill } from "react-icons/bs";
-import { BiCog } from "react-icons/bi";
+import { BiSolidCog } from "react-icons/bi";
+import { IoMdStats } from "react-icons/io";
 import { useOptions } from "../hooks/useOptions";
 import { Link } from "react-router-dom";
 
@@ -12,8 +13,14 @@ const navigationElements = [
     title: "Start a new test",
   },
   {
+    name: "Stats",
+    icon: IoMdStats,
+    path: "/sarutype/stats",
+    title: "Statistics",
+  },
+  {
     name: "Options",
-    icon: BiCog,
+    icon: BiSolidCog,
     path: "/sarutype/options",
     title: "Options",
   },

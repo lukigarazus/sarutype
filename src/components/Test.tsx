@@ -30,8 +30,7 @@ const TestSentenceComponent = ({
   reset: () => void;
 }) => {
   const { options } = useOptions();
-  const { charPerformanceHistory, setCharPerformanceHistory } =
-    useCharPerformanceHistory();
+  const { setCharPerformanceHistory } = useCharPerformanceHistory();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const resetRef = useRef<HTMLButtonElement | null>(null);
@@ -65,27 +64,26 @@ const TestSentenceComponent = ({
       inputRef.current.blur();
       inputRef.current.value = "";
 
-      const newCharPerformance = charPerformanceToCharPerformanceHistory(
-        sentenceConsumerToCharPerformance(
-          sentenceConsumer,
-          options.displaySignSystem.kind,
-          // this is a hack, the first one is always a lot slower and messes up the stats
-        ).slice(1),
-        JSON.parse(JSON.stringify(charPerformanceHistory)),
+      setCharPerformanceHistory((old) =>
+        charPerformanceToCharPerformanceHistory(
+          sentenceConsumerToCharPerformance(
+            sentenceConsumer,
+            options.displaySignSystem.kind,
+            // this is a hack, the first one is always a lot slower and messes up the stats
+          ).slice(1),
+          JSON.parse(JSON.stringify(old)),
+        ),
       );
-      console.log("FINISHED", newCharPerformance);
-
-      //setCharPerformanceHistory(newCharPerformance);
     }
   }, [
     options.displaySignSystem.kind,
     sentenceConsumer,
-    charPerformanceHistory,
     setCharPerformanceHistory,
   ]);
 
   const sentenceKey = useMemo(
     () => sentenceToStringRomaji(sentence),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [sentenceDisplay],
   );
 

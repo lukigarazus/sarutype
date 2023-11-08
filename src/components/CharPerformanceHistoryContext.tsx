@@ -10,16 +10,21 @@ import {
 import { CharPerformanceHistory } from "../models/CharPerformance";
 import { usePersistence } from "./PersistenceContext";
 
+type Status =
+  | { kind: "loading" }
+  | { kind: "loaded"; value: CharPerformanceHistory }
+  | { kind: "error"; error: Error };
+
 export const CharPerformanceHistoryContext = createContext<{
-  charPerformanceHistory: CharPerformanceHistory;
   setCharPerformanceHistory: (
-    charPerformanceHistory: CharPerformanceHistory,
+    charPerformanceHistory:
+      | CharPerformanceHistory
+      | ((prev: CharPerformanceHistory) => CharPerformanceHistory),
   ) => void;
-  loading: boolean;
+  status: Status;
 }>({
-  charPerformanceHistory: { hiragana: {} },
   setCharPerformanceHistory: () => {},
-  loading: true,
+  status: { kind: "loading" },
 });
 
 export const CharPerformanceHistoryProvider = ({
@@ -29,33 +34,56 @@ export const CharPerformanceHistoryProvider = ({
 }) => {
   const { persistence } = usePersistence();
 
-  const [loading, setLoadings] = useState(true);
-  const [charPerformanceHistory, _setCharPerformanceHistory] = useState({
-    hiragana: {},
-  });
+  const [status, setStatus] = useState<Status>({ kind: "loading" });
   const setCharPerformanceHistory = useCallback(
-    (charPerformanceHistory: CharPerformanceHistory) => {
-      console.log("setCharPerformanceHistory");
+    (
+      charPerformanceHistoryHandler:
+        | CharPerformanceHistory
+        | ((prev: CharPerformanceHistory) => CharPerformanceHistory),
+    ) => {
+      let charPerformanceHistory: CharPerformanceHistory | undefined;
+
+      if (typeof charPerformanceHistoryHandler === "function") {
+        setStatus((prev) => {
+          if (prev.kind !== "loaded") return prev;
+          const newValue = charPerformanceHistoryHandler(prev.value);
+          console.log("setting char performance history", newValue);
+          persistence.setCharPerformanceHistory(newValue);
+          return {
+            kind: "loaded",
+            value: newValue,
+          };
+        });
+      } else {
+        charPerformanceHistory = charPerformanceHistoryHandler;
+      }
+
+      if (!charPerformanceHistory) return;
+
+      console.log("setting char performance history", charPerformanceHistory);
       persistence.setCharPerformanceHistory(charPerformanceHistory);
-      _setCharPerformanceHistory(charPerformanceHistory);
+      setStatus({ kind: "loaded", value: charPerformanceHistory });
     },
     [persistence],
   );
   useEffect(() => {
-    setLoadings(true);
+    setStatus({ kind: "loading" });
     const load = async () => {
       const charPerformanceHistory =
-        await persistence.getCharPerformanceHistory();
-      _setCharPerformanceHistory(charPerformanceHistory);
-      setLoadings(false);
+        (await persistence.getCharPerformanceHistory()) || { hiragana: {} };
+      setStatus({ kind: "loaded", value: charPerformanceHistory });
     };
-    load();
+    load()
+      .then(console.log)
+      .catch((err) => setStatus({ kind: "error", error: err }));
   }, [persistence]);
 
-  useEffect(() => {}, [charPerformanceHistory, persistence]);
   const value = useMemo(
-    () => ({ charPerformanceHistory, setCharPerformanceHistory, loading }),
-    [charPerformanceHistory, setCharPerformanceHistory, loading],
+    () => ({
+      setCharPerformanceHistory,
+      status,
+    }),
+    [setCharPerformanceHistory, status],
   );
 
   return (
