@@ -115,6 +115,7 @@ export abstract class StringEntityConsumer {
         return { kind: "success", value: this.state };
       }
     }
+    return { kind: "error", error: "unhandled event kind" };
   }
 }
 

@@ -1,8 +1,4 @@
-import {
-  SentenceConsumer,
-  WordConsumer,
-  CharConsumer,
-} from "./SentenceConsumer";
+import { SentenceConsumer } from "./SentenceConsumer";
 import { Char } from "./Char";
 import { Sentence } from "./Sentence";
 
