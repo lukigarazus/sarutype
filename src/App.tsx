@@ -1,26 +1,21 @@
-import { TestComponent } from "./components/Test";
-import { OptionsPanel } from "./components/OptionsPanel";
-import { useOptions } from "./hooks/useOptions";
-import { StatsPanel } from "./components/StatsPanel";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { TestPage } from "./pages/Test";
+import { OptionsPage } from "./pages/Options";
+
+const router = createBrowserRouter([
+  {
+    path: "/sarutype/",
+    element: <TestPage />,
+    children: [],
+  },
+  {
+    path: "/sarutype/options",
+    element: <OptionsPage />,
+  },
+]);
 
 function App() {
-  const { loading: optionsLoading } = useOptions();
-  return (
-    <>
-      <h1>Sarutype</h1>
-      <main>
-        {!optionsLoading ? (
-          <>
-            <TestComponent />
-            <OptionsPanel />
-            <StatsPanel />
-          </>
-        ) : (
-          <div>Loading options...</div>
-        )}
-      </main>
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
