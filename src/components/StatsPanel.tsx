@@ -31,12 +31,17 @@ const PerformanceChartWithCharOnXAxisAndTimeAndErrorRateOnYAxis = ({
         data={charPerformanceObjects}
       >
         <XAxis dataKey="char" />
-        <YAxis unit="%" yAxisId="errors" orientation="right" />
-        <YAxis unit="ms" yAxisId="time" orientation="left" />
+        <YAxis
+          domain={[0, 100]}
+          unit="%"
+          yAxisId="errorRate"
+          orientation="right"
+        />
+        <YAxis unit="ms" yAxisId="averageTime" orientation="left" />
         <Tooltip />
         <Legend />
-        <Bar yAxisId="time" dataKey="averageTime" fill="blue" />
-        <Bar yAxisId="errors" dataKey="errorRate" fill="red" />
+        <Bar yAxisId="averageTime" dataKey="averageTime" fill="blue" />
+        <Bar yAxisId="errorRate" dataKey="errorRate" fill="red" />
       </BarChart>
     </div>
   );
