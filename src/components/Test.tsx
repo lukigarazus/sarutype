@@ -8,7 +8,11 @@ import {
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
-import { Sentence, sentenceConsumerFromSentence } from "../models/Sentence";
+import {
+  Sentence,
+  sentenceConsumerFromSentence,
+  sentenceToStringRomaji,
+} from "../models/Sentence";
 import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
@@ -79,6 +83,11 @@ const TestSentenceComponent = ({
     charPerformanceHistory,
     setCharPerformanceHistory,
   ]);
+
+  const sentenceKey = useMemo(
+    () => sentenceToStringRomaji(sentence),
+    [sentenceDisplay],
+  );
 
   useEffect(() => {
     setSentenceDisplay(sentenceDisplayFromSentenceConsumer(sentenceConsumer));
@@ -168,7 +177,7 @@ const TestSentenceComponent = ({
               Finished
             </div>
           )}
-          <SentenceComponent sentence={sentenceDisplay} />
+          <SentenceComponent key={sentenceKey} sentence={sentenceDisplay} />
         </div>
       </div>
       <div
