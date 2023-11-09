@@ -53,6 +53,8 @@ export const OptionsPanel = () => {
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-around",
+            padding: "10px 0",
+            gap: "10px",
           }}
         >
           {options.displaySignSystem.possibleDisplaySigns.map((s) => (
@@ -84,6 +86,9 @@ export const OptionsPanel = () => {
                 }}
               />
               <label htmlFor={s}>{s}</label>
+              <label htmlFor={s}>
+                {options.displaySignSystem.convertToInputSigns(s)}
+              </label>
             </div>
           ))}
         </div>

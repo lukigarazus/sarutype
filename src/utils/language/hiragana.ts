@@ -53,3 +53,8 @@ export type HiraganaSet = Set<keyof typeof hiraganaToRomanji>;
 export type HiraganaSign = keyof typeof hiraganaToRomanji;
 export type HiraganaSigns = TuplifyUnion<HiraganaSign>;
 export const hiraganaSigns = Object.keys(hiraganaToRomanji) as HiraganaSigns;
+export const hiraganaCharToRomaji = (char: string) => {
+  const hiraganaSign = hiraganaSigns.find((sign) => sign === char);
+  if (!hiraganaSign) return "";
+  return hiraganaToRomanji[char as HiraganaSign];
+};

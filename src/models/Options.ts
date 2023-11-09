@@ -4,6 +4,7 @@ import {
   HiraganaSign,
   HiraganaSigns,
   hiraganaSigns,
+  hiraganaCharToRomaji,
 } from "../utils/language/hiragana";
 import { getRandomSentence } from "../utils/language/words";
 import { Sentence } from "./Sentence";
@@ -25,6 +26,7 @@ type HiraganaDisplay = {
     count: number,
     allowedChars: HiraganaSet,
   ) => Result<Sentence, string>;
+  convertToInputSigns: (str: string) => string;
 };
 
 export type Options = {
@@ -47,6 +49,7 @@ export const defaultOptions: Options = {
     allowedDisplaySigns: new Set(),
     possibleDisplaySigns: hiraganaSigns,
     getRandomSentence,
+    convertToInputSigns: hiraganaCharToRomaji,
   },
 };
 
@@ -66,6 +69,7 @@ export const pickDisplaySignSystem = (signSystem: string, options: Options) => {
       allowedDisplaySigns: new Set(),
       possibleDisplaySigns: hiraganaSigns,
       getRandomSentence,
+      convertToInputSigns: hiraganaCharToRomaji,
     };
   }
   return newOptions;
