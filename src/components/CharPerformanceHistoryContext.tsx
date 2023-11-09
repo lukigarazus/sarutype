@@ -9,11 +9,13 @@ import {
 
 import { CharPerformanceHistory } from "../models/CharPerformance";
 import { usePersistence } from "./PersistenceContext";
+import {
+  AsyncResult,
+  mapAsyncResult,
+  okAsyncResult,
+} from "../types/AsyncResult";
 
-type Status =
-  | { kind: "loading" }
-  | { kind: "loaded"; value: CharPerformanceHistory }
-  | { kind: "error"; error: Error };
+type Status = AsyncResult<CharPerformanceHistory, string>;
 
 export const CharPerformanceHistoryContext = createContext<{
   setCharPerformanceHistory: (
@@ -44,16 +46,14 @@ export const CharPerformanceHistoryProvider = ({
       let charPerformanceHistory: CharPerformanceHistory | undefined;
 
       if (typeof charPerformanceHistoryHandler === "function") {
-        setStatus((prev) => {
-          if (prev.kind !== "loaded") return prev;
-          const newValue = charPerformanceHistoryHandler(prev.value);
-          console.log("setting char performance history", newValue);
-          persistence.setCharPerformanceHistory(newValue);
-          return {
-            kind: "loaded",
-            value: newValue,
-          };
-        });
+        setStatus((prev) =>
+          mapAsyncResult(prev, (prevValue) => {
+            const newValue = charPerformanceHistoryHandler(prevValue);
+            console.log("setting char performance history", newValue);
+            persistence.setCharPerformanceHistory(newValue);
+            return okAsyncResult(newValue);
+          }),
+        );
       } else {
         charPerformanceHistory = charPerformanceHistoryHandler;
       }
@@ -62,16 +62,17 @@ export const CharPerformanceHistoryProvider = ({
 
       console.log("setting char performance history", charPerformanceHistory);
       persistence.setCharPerformanceHistory(charPerformanceHistory);
-      setStatus({ kind: "loaded", value: charPerformanceHistory });
+      setStatus(okAsyncResult(charPerformanceHistory));
     },
     [persistence],
   );
+
   useEffect(() => {
     setStatus({ kind: "loading" });
     const load = async () => {
       const charPerformanceHistory =
         (await persistence.getCharPerformanceHistory()) || { hiragana: {} };
-      setStatus({ kind: "loaded", value: charPerformanceHistory });
+      setStatus(okAsyncResult(charPerformanceHistory));
     };
     load()
       .then(console.log)

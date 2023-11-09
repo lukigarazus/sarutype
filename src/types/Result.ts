@@ -24,6 +24,18 @@ export const catResult = <T, E>(results: Result<T, E>[]): Result<T[], E> => {
   };
 };
 
+export const mapResult = <T, U, E>(
+  result: Result<T, E>,
+  fn: (value: T) => U,
+): Result<U, E> => {
+  if (result.kind === "error") return result;
+
+  return {
+    kind: "ok",
+    value: fn(result.value),
+  };
+};
+
 export const resultUnsafeUnwrap = <T, E>(result: Result<T, E>): T => {
   if (result.kind === "error") {
     throw result.error;
