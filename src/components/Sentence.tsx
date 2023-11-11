@@ -32,13 +32,19 @@ const CharComponent = ({
   });
 
   useEffect(() => {
-    if (isActive)
+    if (isActive) {
       setTimeout(() => {
         setBottomSlotState((state) => {
           if (state.kind === "empty") return { kind: "hint" };
           return state;
         });
       }, showTransliterationTimeout);
+      elementRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
   }, [isActive, showTransliterationTimeout]);
 
   useEffect(() => {

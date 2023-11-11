@@ -94,6 +94,12 @@ const TestSentenceComponent = ({
   useEffect(() => {
     checkTestEnd();
   }, [sentenceDisplay, checkTestEnd]);
+
+  const containerHeight = 300;
+  const containerWidth = 700;
+  const containerPadding = "0.5em";
+  const containerBorderRadius = "0.5em";
+  const containerBorder = "1px solid black";
   return (
     <div>
       <input
@@ -143,38 +149,43 @@ const TestSentenceComponent = ({
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          position: "relative",
         }}
       >
+        {sentenceConsumer.state.kind === "finished" && (
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: containerWidth,
+              height: containerHeight,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 1,
+              padding: containerPadding,
+              borderRadius: containerBorderRadius,
+              border: containerBorder,
+            }}
+          >
+            Finished
+          </div>
+        )}
+
         <div
           style={{
             position: "relative",
-            width: 700,
-            height: 300,
+            width: containerWidth,
+            height: containerHeight,
             overflowY: "auto",
-            border: "1px solid black",
-            borderRadius: "0.5em",
-            padding: "0.5em",
+            border: containerBorder,
+            borderRadius: containerBorderRadius,
+            padding: containerPadding,
           }}
           onClick={startTest}
         >
-          {sentenceConsumer.state.kind === "finished" && (
-            <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 1,
-              }}
-            >
-              Finished
-            </div>
-          )}
           <SentenceComponent key={sentenceKey} sentence={sentenceDisplay} />
         </div>
       </div>

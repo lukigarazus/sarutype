@@ -33,6 +33,7 @@ export const Layout: ComponentType<PropsWithChildren> = ({ children }) => {
       <header
         style={{
           height: "3em",
+          padding: "0.5em",
           display: "flex",
         }}
       >
@@ -78,7 +79,7 @@ export const Layout: ComponentType<PropsWithChildren> = ({ children }) => {
           justifyContent: "center",
           alignItems: "center",
           width: "100%",
-          height: "calc(100vh - 3em)",
+          height: "calc(100vh - 3em - 1em)",
         }}
       >
         {optionsLoading ? "Loading..." : children}
