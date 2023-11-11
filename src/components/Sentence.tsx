@@ -16,8 +16,10 @@ type BottomSlotState =
 
 const CharComponent = ({
   char: { char, isActive, isWrong, isCorrect, underlying },
+  isLast,
 }: {
   char: CharDisplay;
+  isLast: boolean;
 }) => {
   const elementRef = useRef<HTMLSpanElement | null>(null);
 
@@ -52,88 +54,113 @@ const CharComponent = ({
         setBottomSlotState({ kind: "finished" });
       }, 2000);
   }, [isCorrect, isWrong]);
-
+  const charWidth = 26;
+  const charPadding = 0.3;
+  const baseCharStyle = {
+    display: "inline-flex",
+    flexDirection: "column",
+    padding: `${charPadding}em`,
+    position: "relative",
+    width: `calc(${charWidth}px - ${charPadding * 2}em)`,
+  } as const;
   return (
-    <span
-      ref={elementRef}
-      style={{
-        display: "inline-flex",
-        flexDirection: "column",
-        padding: "0.3em",
-        position: "relative",
-        width: "calc(26px - 0.6em)",
-      }}
-    >
-      <span
-        style={{
-          color: isWrong
-            ? "red"
-            : isCorrect
-            ? "white"
-            : isActive
-            ? "yellow"
-            : "grey",
-          marginBottom:
-            bottomSlotState.kind !== "empty" &&
-            bottomSlotState.kind !== "finished"
-              ? 0
-              : 24,
-        }}
-      >
-        {char.hiragana}
+    <>
+      <span ref={elementRef} style={baseCharStyle}>
+        <span
+          style={{
+            color: isWrong
+              ? "red"
+              : isCorrect
+              ? "white"
+              : isActive
+              ? "yellow"
+              : "grey",
+            marginBottom:
+              bottomSlotState.kind !== "empty" &&
+              bottomSlotState.kind !== "finished"
+                ? 0
+                : 24,
+          }}
+        >
+          {char.hiragana}
+        </span>
+        {bottomSlotState.kind === "error" && (
+          <span
+            style={{
+              color: "red",
+            }}
+          >
+            {char.romaji}
+          </span>
+        )}
+        {bottomSlotState.kind === "active" && (
+          <span
+            style={{
+              color: "yellow",
+            }}
+          >
+            {underlying}
+          </span>
+        )}
+        {bottomSlotState.kind === "hint" && (
+          <span
+            style={{
+              color: "grey",
+            }}
+          >
+            {char.romaji}
+          </span>
+        )}
+        {bottomSlotState.kind === "correct" && (
+          <span
+            style={{
+              color: "white",
+            }}
+          >
+            {char.romaji}
+          </span>
+        )}
       </span>
-      {bottomSlotState.kind === "error" && (
+      {isLast && (
         <span
           style={{
-            color: "red",
+            ...baseCharStyle,
+            textAlign: "center",
           }}
         >
-          {char.romaji}
+          <span
+            style={{
+              color: "grey",
+            }}
+          >
+            •
+          </span>
         </span>
       )}
-      {bottomSlotState.kind === "active" && (
-        <span
-          style={{
-            color: "yellow",
-          }}
-        >
-          {underlying}
-        </span>
-      )}
-      {bottomSlotState.kind === "hint" && (
-        <span
-          style={{
-            color: "grey",
-          }}
-        >
-          {char.romaji}
-        </span>
-      )}
-      {bottomSlotState.kind === "correct" && (
-        <span
-          style={{
-            color: "white",
-          }}
-        >
-          {char.romaji}
-        </span>
-      )}
-    </span>
+    </>
   );
 };
 
-const WordComponent = ({ word }: { word: WordDisplay }) => {
+const WordComponent = ({
+  word,
+  isLast,
+}: {
+  word: WordDisplay;
+  isLast: boolean;
+}) => {
   return (
     <span
       style={{
-        marginRight: "1em",
         display: "inline-flex",
         flexDirection: "row",
         flexWrap: "nowrap",
       }}
     >
-      {word.chars.map((char) => (
-        <CharComponent char={char} />
+      {word.chars.map((char, i) => (
+        <CharComponent
+          char={char}
+          isLast={!isLast && i === word.chars.length - 1}
+        />
       ))}
     </span>
   );
@@ -145,8 +172,8 @@ export const SentenceComponent = ({
 }) => {
   return (
     <>
-      {sentence.words.map((word) => (
-        <WordComponent word={word} />
+      {sentence.words.map((word, i) => (
+        <WordComponent word={word} isLast={i === sentence.words.length - 1} />
       ))}
     </>
   );
