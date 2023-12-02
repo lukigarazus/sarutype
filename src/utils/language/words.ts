@@ -12,12 +12,14 @@ export const getRandomSentence = (
 ): Result<Sentence, string> => {
   const localFrequencies = { ...frequencies };
 
-  const allowedWords = DBWords.filter((word) => {
-    if (!allowedChars) return true;
-    const chars = word.hiragana.split("");
-    const isAllowed = chars.every((char) => allowedChars.has(char));
-    return isAllowed;
-  });
+  const allowedWords = shuffle(
+    DBWords.filter((word) => {
+      if (!allowedChars) return true;
+      const chars = word.hiragana.split("");
+      const isAllowed = chars.every((char) => allowedChars.has(char));
+      return isAllowed;
+    }),
+  );
 
   const sortedWords = sortWordsByWeight(
     allowedWords.map((word) => word.hiragana),
