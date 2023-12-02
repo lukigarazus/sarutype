@@ -2,11 +2,8 @@ import { useMemo } from "react";
 import { useCharPerformanceHistory } from "./CharPerformanceHistoryContext";
 import { useOptions } from "../hooks/useOptions";
 import { PerformanceBarChart } from "./charts/PerformanceBarChart";
-import {
-  AsyncResult,
-  mapAsyncResult,
-  okAsyncResult,
-} from "../types/AsyncResult";
+import { AsyncResult, mapAsyncResult } from "../types/AsyncResult";
+import { charPerformanceHistoryToChronologicalCharPerformanceHistory } from "../models/CharPerformance";
 
 export const StatsPanel = () => {
   const { options } = useOptions();
@@ -15,18 +12,12 @@ export const StatsPanel = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AsyncResult<any, "empty" | string>
   >(() => {
-    return mapAsyncResult(status, (value) => {
-      const displaySignSystemData = value[options.displaySignSystem.kind];
-      const chronologicalCharPerformanceHistories = Object.entries(
-        displaySignSystemData,
-      )
-        .sort(([timestamp1], [timestamp2]) => +timestamp1 - +timestamp2)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .map(([_, history]) => history);
-      if (!chronologicalCharPerformanceHistories.length)
-        return { kind: "error", error: "empty" };
-      return okAsyncResult(chronologicalCharPerformanceHistories);
-    });
+    return mapAsyncResult(status, (value) =>
+      charPerformanceHistoryToChronologicalCharPerformanceHistory(
+        value,
+        options.displaySignSystem.kind,
+      ),
+    );
   }, [status, options.displaySignSystem.kind]);
 
   return (

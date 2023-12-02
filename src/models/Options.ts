@@ -25,6 +25,7 @@ type HiraganaDisplay = {
   getRandomSentence: (
     count: number,
     allowedChars: HiraganaSet,
+    frequencies: Record<HiraganaSign, number>,
   ) => Result<Sentence, string>;
   convertToInputSigns: (str: string) => string;
 };

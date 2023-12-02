@@ -1,39 +1,65 @@
 import { Sentence, makeSentence } from "../../models/Sentence";
 import { Word, wordFromRomaji, wordToStringHiragana } from "../../models/Word";
-import { Result, catResult } from "../../types/Result";
-import { randomElement, arrayOfLength } from "../array";
+import { Result } from "../../types/Result";
+import { shuffle } from "../array";
+import { learningWordWeightMax, sortWordsByWeight } from "../learningSort";
 import { hiraganaToRomanji } from "./hiragana";
 
 export const getRandomSentence = (
   length: number,
-  allowedChars?: Set<string>,
+  allowedChars: Set<string>,
+  frequencies: Record<string, number>,
 ): Result<Sentence, string> => {
-  const result = catResult(
-    arrayOfLength(length, 0).map(() => getRandomWord(allowedChars)),
-  );
-  switch (result.kind) {
-    case "ok":
-      return {
-        kind: "ok",
-        value: makeSentence(result.value),
-      };
-    case "error":
-      return { kind: "error", error: result.error };
-  }
-};
+  const localFrequencies = { ...frequencies };
 
-export const getRandomWord = (
-  allowedChars?: Set<string>,
-): Result<Word, string> => {
   const allowedWords = DBWords.filter((word) => {
     if (!allowedChars) return true;
     const chars = word.hiragana.split("");
     const isAllowed = chars.every((char) => allowedChars.has(char));
     return isAllowed;
   });
-  const element = randomElement(allowedWords);
-  if (!element) return { kind: "error", error: "No words found" };
-  return { kind: "ok", value: DBWordToWord(element) };
+
+  const sortedWords = sortWordsByWeight(
+    allowedWords.map((word) => word.hiragana),
+    localFrequencies,
+    learningWordWeightMax,
+  );
+
+  const result: DBWord[] = [];
+
+  while (result.length < length) {
+    const word = sortedWords[0];
+
+    if (!word) {
+      return {
+        kind: "error",
+        error: "No words found",
+      };
+    }
+
+    const wordObject = allowedWords.find((w) => w.hiragana === word);
+    if (!wordObject) {
+      return {
+        kind: "error",
+        error: "No word object found",
+      };
+    }
+    const chars = wordObject.hiragana.split("");
+    chars.forEach((char) => {
+      localFrequencies[char] = localFrequencies[char] || 0;
+      localFrequencies[char] += 1;
+    });
+    result.push(wordObject);
+    sortWordsByWeight(sortedWords, localFrequencies, learningWordWeightMax);
+  }
+
+  const shuffledResult = shuffle(result);
+
+  const sentence = makeSentence(
+    shuffledResult.map((word) => DBWordToWord(word)),
+  );
+
+  return { kind: "ok", value: sentence };
 };
 
 const isDBWordValid = (dbWord: DBWord) => {

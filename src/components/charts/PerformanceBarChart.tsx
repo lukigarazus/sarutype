@@ -2,23 +2,11 @@ import { useEffect, useMemo, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
 import {
   CharPerformanceHistory,
-  CharPerformanceState,
+  charPerformanceHistoryChronologicalToCharPerformanceObject,
 } from "../../models/CharPerformance";
 import { AvailableDisplaySignSystems } from "../../models/Options";
 import { scan } from "../../utils/array";
 import { BiPause, BiPlay } from "react-icons/bi";
-
-type PerformanceObject = {
-  total: number;
-  correct: number;
-  wrong: number;
-  times: number[];
-};
-type CharPerformanceObject = {
-  char: string;
-  averageTime: number;
-  errorRate: number;
-} & PerformanceObject;
 
 export const PerformanceBarChart = ({
   chronologicalCharPerformanceHistories,
@@ -32,6 +20,7 @@ export const PerformanceBarChart = ({
 
   const [charPerformanceObjectsArray, yDomain] = useMemo(() => {
     let yDomain = 0;
+    let topTotal = 0;
 
     return [
       scan(
@@ -48,42 +37,19 @@ export const PerformanceBarChart = ({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         {} as any,
       ).map((mergedCharPerformanceHistory) => {
-        const performanceObjects: Record<string, PerformanceObject> =
-          Object.fromEntries(
-            Object.entries(mergedCharPerformanceHistory).map(
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ([sign, performances]: [string, any]) => {
-                const performanceObject = performances.reduce(
-                  (acc: PerformanceObject, el: CharPerformanceState) => {
-                    acc.total++;
-                    if (el.kind === "finished") {
-                      acc.correct++;
-                      acc.times.push(el.time);
-                    } else if (el.kind === "error") acc.wrong++;
-                    return acc;
-                  },
-                  { total: 0, correct: 0, wrong: 0, times: [] as number[] },
-                );
-                return [sign, performanceObject];
-              },
-            ),
+        const results =
+          charPerformanceHistoryChronologicalToCharPerformanceObject(
+            mergedCharPerformanceHistory,
           );
-        return Object.entries(performanceObjects).map(([char, performance]) => {
-          const averageTime =
-            performance.times.reduce((acc, el) => acc + el, 0) /
-            performance.times.length;
-          console.log(averageTime, yDomain);
-          if (averageTime > yDomain) yDomain = averageTime;
+        results.forEach((result) => {
+          if (result.averageTime > yDomain) yDomain = result.averageTime;
+          if (result.total > topTotal) topTotal = result.total;
+        });
 
-          return {
-            char,
-            averageTime,
-            errorRate: (performance.wrong / performance.total) * 100,
-            ...performance,
-          };
-        }) as CharPerformanceObject[];
+        return results;
       }),
       yDomain,
+      topTotal,
     ];
   }, [chronologicalCharPerformanceHistories]);
 

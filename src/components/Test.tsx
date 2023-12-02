@@ -1,10 +1,13 @@
-import {
+import React, {
   useMemo,
   useState,
   ChangeEvent,
   useEffect,
   useRef,
   useCallback,
+  ComponentType,
+  PropsWithChildren,
+  ReactElement,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
 
@@ -17,6 +20,9 @@ import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
 import {
+  charPerformanceHistoryChronologicalToCharPerformanceObject,
+  charPerformanceHistoryChronologicalToFrequencyObject,
+  charPerformanceHistoryToChronologicalCharPerformanceHistory,
   charPerformanceToCharPerformanceHistory,
   sentenceConsumerToCharPerformance,
 } from "../models/CharPerformance";
@@ -214,14 +220,43 @@ const TestSentenceComponent = ({
   );
 };
 
-export const TestComponent = () => {
+const FrequenciesWrapper: ComponentType<{
+  children: (frequencies: Record<string, number>) => ReactElement;
+}> = ({ children }) => {
+  const { status } = useCharPerformanceHistory();
   const { options } = useOptions();
-  console.log(options);
+
+  const frequencies = useMemo(() => {
+    if (status.kind === "ok") {
+      const chronological =
+        charPerformanceHistoryToChronologicalCharPerformanceHistory(
+          status.value,
+          options.displaySignSystem.kind,
+        );
+      if (chronological.kind === "ok") {
+        return charPerformanceHistoryChronologicalToFrequencyObject(
+          chronological.value,
+        );
+      }
+    }
+  }, [status, options.displaySignSystem.kind]);
+  console.log(frequencies);
+
+  return <>{frequencies ? children(frequencies) : null}</>;
+};
+
+const TestComponentInner = ({
+  frequencies,
+}: {
+  frequencies: Record<string, number>;
+}) => {
+  const { options } = useOptions();
 
   const [sentence, setSentence] = useState(
     options.displaySignSystem.getRandomSentence(
       options.numberOfWordsPerTest,
       options.displaySignSystem.allowedDisplaySigns,
+      frequencies,
     ),
   );
 
@@ -230,6 +265,7 @@ export const TestComponent = () => {
       options.displaySignSystem.getRandomSentence(
         options.numberOfWordsPerTest,
         options.displaySignSystem.allowedDisplaySigns,
+        frequencies,
       ),
     );
   };
@@ -238,5 +274,13 @@ export const TestComponent = () => {
     <div>Error while getting a sentence: {sentence.error}</div>
   ) : (
     <TestSentenceComponent sentence={sentence.value} reset={reset} />
+  );
+};
+
+export const TestComponent = () => {
+  return (
+    <FrequenciesWrapper>
+      {(frequencies) => <TestComponentInner frequencies={frequencies} />}
+    </FrequenciesWrapper>
   );
 };
