@@ -80,6 +80,6 @@ export const sortWordsByWeight = (
     if (weight1 > weight2) {
       return -1;
     }
-    return 0;
+    return Math.random() - 0.5;
   });
 };
