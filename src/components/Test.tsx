@@ -1,4 +1,4 @@
-import React, {
+import {
   useMemo,
   useState,
   ChangeEvent,
@@ -6,7 +6,6 @@ import React, {
   useRef,
   useCallback,
   ComponentType,
-  PropsWithChildren,
   ReactElement,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
@@ -20,7 +19,6 @@ import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
 import {
-  charPerformanceHistoryChronologicalToCharPerformanceObject,
   charPerformanceHistoryChronologicalToFrequencyObject,
   charPerformanceHistoryToChronologicalCharPerformanceHistory,
   charPerformanceToCharPerformanceHistory,
