@@ -11,7 +11,7 @@ export const OptionsPanel = () => {
   const { options, setOptions } = useOptions();
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <div>
         <label htmlFor="displaySigns">I want to learn:</label>
         <select
@@ -44,7 +44,7 @@ export const OptionsPanel = () => {
           ))}
         </select>
       </div>
-      <div>
+      <div style={{ width: "100%" }}>
         <label htmlFor="displaySigns">
           I want to learn the following signs:
         </label>
@@ -52,9 +52,10 @@ export const OptionsPanel = () => {
           style={{
             display: "flex",
             flexDirection: "row",
-            justifyContent: "space-around",
+            justifyContent: "flex-start",
             padding: "10px 0",
             gap: "10px",
+            flexWrap: "wrap",
           }}
         >
           {options.displaySignSystem.possibleDisplaySigns.map((s) => (

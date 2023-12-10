@@ -236,6 +236,7 @@ const FrequenciesWrapper: ComponentType<{
           chronological.value,
         );
       }
+      return {};
     }
   }, [status, options.displaySignSystem.kind]);
   console.log(frequencies);

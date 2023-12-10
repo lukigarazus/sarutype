@@ -1,5 +1,8 @@
 const convertFrequenciesToRelative = (frequencies: Record<string, number>) => {
-  const total = Object.values(frequencies).reduce((acc, value) => acc + value);
+  const total = Object.values(frequencies).reduce(
+    (acc, value) => acc + value,
+    0,
+  );
   return Object.keys(frequencies).reduce(
     (acc, key) => ({
       ...acc,
