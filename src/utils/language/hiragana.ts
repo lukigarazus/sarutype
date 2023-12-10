@@ -1,5 +1,3 @@
-import { TuplifyUnion } from "../../types/TuplifyUnion";
-
 export const hiraganaToRomanji = {
   あ: "a",
   い: "i",
@@ -77,7 +75,7 @@ export const hiraganaToRomanji = {
 
 export type HiraganaSet = Set<keyof typeof hiraganaToRomanji>;
 export type HiraganaSign = keyof typeof hiraganaToRomanji;
-export type HiraganaSigns = TuplifyUnion<HiraganaSign>;
+export type HiraganaSigns = HiraganaSign[];
 export const hiraganaSigns = Object.keys(hiraganaToRomanji) as HiraganaSigns;
 export const hiraganaCharToRomaji = (char: string) => {
   const hiraganaSign = hiraganaSigns.find((sign) => sign === char);
