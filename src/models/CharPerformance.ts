@@ -1,7 +1,10 @@
 import { Result } from "../types/Result";
-import { HiraganaSign, hiraganaSigns } from "../utils/language/hiragana";
-import { AvailableDisplaySignSystems } from "./Options";
+import {
+  hiraganaSigns,
+  HiraganaSign,
+} from "./signSystems/hiragana/hiraganaSigns";
 import { SentenceConsumer } from "./SentenceConsumer";
+import { AllSignSystems } from "./signSystems/types";
 
 export type CharPerformanceState =
   | { kind: "not finished" }
@@ -12,12 +15,12 @@ export type CharPerformance = {
   char: string;
   state: CharPerformanceState;
   timestamp: number;
-  signSystem: AvailableDisplaySignSystems;
+  signSystem: AllSignSystems;
 };
 
 export const sentenceConsumerToCharPerformance = (
   sentenceConsumer: SentenceConsumer,
-  displaySignSystem: AvailableDisplaySignSystems,
+  displaySignSystem: AllSignSystems,
 ): CharPerformance[] => {
   const timestamp = Date.now();
   const charPerformanceObjects = sentenceConsumer.wordConsumers.flatMap(
@@ -30,7 +33,7 @@ export const sentenceConsumerToCharPerformance = (
               : { kind: "error" as const }
             : { kind: "not finished" as const };
         return {
-          char: charConsumer.char.hiragana,
+          char: charConsumer.char.display,
           state: charState,
           timestamp,
           signSystem: displaySignSystem,
@@ -44,12 +47,14 @@ export const sentenceConsumerToCharPerformance = (
 
 export type CharPerformanceHistory = {
   hiragana: Record<number, Record<HiraganaSign, CharPerformanceState[]>>;
+  roman: Record<number, Record<string, CharPerformanceState[]>>;
 };
 
 export const charPerformanceToCharPerformanceHistory = (
   charPerformances: CharPerformance[],
   history: CharPerformanceHistory = {
     hiragana: {},
+    roman: {},
   },
 ): CharPerformanceHistory => {
   charPerformances.forEach((charPerformance) => {
@@ -72,11 +77,8 @@ export const charPerformanceToCharPerformanceHistory = (
 
 export const charPerformanceHistoryToChronologicalCharPerformanceHistory = (
   value: CharPerformanceHistory,
-  displaySignSystem: AvailableDisplaySignSystems,
-): Result<
-  CharPerformanceHistory[AvailableDisplaySignSystems][number][],
-  "empty"
-> => {
+  displaySignSystem: AllSignSystems,
+): Result<CharPerformanceHistory[AllSignSystems][number][], "empty"> => {
   const displaySignSystemData = value[displaySignSystem];
   const chronologicalCharPerformanceHistories = Object.entries(
     displaySignSystemData,
@@ -106,7 +108,7 @@ export type CharPerformanceObject = {
 } & PerformanceObject;
 
 export const charPerformanceHistoryChronologicalToCharPerformanceObject = (
-  charPerformanceHistoryEntry: CharPerformanceHistory[AvailableDisplaySignSystems],
+  charPerformanceHistoryEntry: CharPerformanceHistory[AllSignSystems],
 ) => {
   const performanceObjects: Record<string, PerformanceObject> =
     Object.fromEntries(
@@ -143,7 +145,7 @@ export const charPerformanceHistoryChronologicalToCharPerformanceObject = (
 };
 
 export const charPerformanceHistoryChronologicalToFrequencyObject = (
-  charPerformanceHistoryChronological: CharPerformanceHistory[AvailableDisplaySignSystems][number][],
+  charPerformanceHistoryChronological: CharPerformanceHistory[AllSignSystems][number][],
 ) => {
   return charPerformanceHistoryChronological.reduce(
     (acc, performance) => {

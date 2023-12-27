@@ -1,63 +1,25 @@
-import { Result } from "../types/Result";
-import {
-  HiraganaSet,
-  HiraganaSign,
-  HiraganaSigns,
-  hiraganaSigns,
-  hiraganaCharToRomaji,
-} from "../utils/language/hiragana";
-import { getRandomSentence } from "../utils/language/words";
-import { Sentence } from "./Sentence";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-type Roman = "roman";
-type Hiragana = "hiragana";
-//type Hebrew = "hebrew";
+import { hiraganaDisplay } from "./signSystems/hiragana/hiraganaDisplay";
+import { AllSignSystems, allSignSystems } from "./signSystems/types";
 
-export type AvailableDisplaySignSystems = Hiragana;
-export const availableDisplaySignSystems: [Hiragana] = ["hiragana"];
-export type AvailableInputSignsystems = Roman;
-export const availableInputSignsystems: [Roman] = ["roman"];
-
-type HiraganaDisplay = {
-  kind: Hiragana;
-  allowedDisplaySigns: HiraganaSet;
-  possibleDisplaySigns: HiraganaSigns;
-  getRandomSentence: (
-    count: number,
-    allowedChars: HiraganaSet,
-    frequencies: Record<HiraganaSign, number>,
-  ) => Result<Sentence, string>;
-  convertToInputSigns: (str: string) => string;
-};
-
-export type Options = {
-  showTransliterationTimeout: number;
-  numberOfWordsPerTest: number;
-
-  inputSignSystem: AvailableInputSignsystems;
-
-  displaySignSystem: HiraganaDisplay;
-};
-
-export const defaultOptions: Options = {
+export const defaultOptions = {
   showTransliterationTimeout: 5000,
   numberOfWordsPerTest: 10,
 
-  inputSignSystem: "roman",
+  inputSignSystem: "roman" as AllSignSystems,
 
-  displaySignSystem: {
-    kind: "hiragana",
-    allowedDisplaySigns: new Set(),
-    possibleDisplaySigns: hiraganaSigns,
-    getRandomSentence,
-    convertToInputSigns: hiraganaCharToRomaji,
-  },
+  displaySignSystem: hiraganaDisplay,
+
+  reverseSignSystems: false,
 };
+
+export type Options = typeof defaultOptions;
 
 export const pickInputSignSystem = (signSystem: string, options: Options) => {
   const newOptions = { ...options };
-  if (availableInputSignsystems.includes(signSystem as Roman)) {
-    newOptions.inputSignSystem = signSystem as Roman;
+  if (allSignSystems.includes(signSystem as any)) {
+    newOptions.inputSignSystem = signSystem as AllSignSystems;
   }
   return newOptions;
 };
@@ -65,13 +27,7 @@ export const pickInputSignSystem = (signSystem: string, options: Options) => {
 export const pickDisplaySignSystem = (signSystem: string, options: Options) => {
   const newOptions = { ...options };
   if (signSystem === "hiragana") {
-    newOptions.displaySignSystem = {
-      kind: "hiragana",
-      allowedDisplaySigns: new Set(),
-      possibleDisplaySigns: hiraganaSigns,
-      getRandomSentence,
-      convertToInputSigns: hiraganaCharToRomaji,
-    };
+    newOptions.displaySignSystem = hiraganaDisplay;
   }
   return newOptions;
 };
@@ -81,20 +37,21 @@ export const pickDisplaySign = (
   options: Options,
 ): Options => {
   const newOptions = { ...options };
-  if (newOptions.displaySignSystem.kind === "hiragana") {
-    if (hiraganaSigns.includes(event.sign as HiraganaSign))
-      switch (event.kind) {
-        case "add":
-          newOptions.displaySignSystem.allowedDisplaySigns.add(
-            event.sign as HiraganaSign,
-          );
-          break;
-        case "remove":
-          newOptions.displaySignSystem.allowedDisplaySigns.delete(
-            event.sign as HiraganaSign,
-          );
-          break;
-      }
+  switch (event.kind) {
+    case "add":
+      newOptions.displaySignSystem.allowedDisplaySigns.add(event.sign as any);
+      break;
+    case "remove":
+      newOptions.displaySignSystem.allowedDisplaySigns.delete(
+        event.sign as any,
+      );
+      break;
   }
+  return newOptions;
+};
+
+export const switchReverseSignSystems = (options: Options) => {
+  const newOptions = { ...options };
+  newOptions.reverseSignSystems = !newOptions.reverseSignSystems;
   return newOptions;
 };

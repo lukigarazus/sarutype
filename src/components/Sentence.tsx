@@ -88,7 +88,7 @@ const CharComponent = ({
                 : 24,
           }}
         >
-          {char.hiragana}
+          {char.display}
         </span>
         {bottomSlotState.kind === "error" && (
           <span
@@ -96,7 +96,7 @@ const CharComponent = ({
               color: "red",
             }}
           >
-            {char.romaji}
+            {char.underlyingRepresentation}
           </span>
         )}
         {bottomSlotState.kind === "active" && (
@@ -114,7 +114,7 @@ const CharComponent = ({
               color: "grey",
             }}
           >
-            {char.romaji}
+            {char.underlyingRepresentation}
           </span>
         )}
         {bottomSlotState.kind === "correct" && (
@@ -123,7 +123,7 @@ const CharComponent = ({
               color: "white",
             }}
           >
-            {char.romaji}
+            {char.underlyingRepresentation}
           </span>
         )}
       </span>

@@ -1,9 +1,114 @@
-import { Sentence, makeSentence } from "../../models/Sentence";
-import { Word, wordFromRomaji, wordToStringHiragana } from "../../models/Word";
-import { Result } from "../../types/Result";
-import { shuffle } from "../array";
-import { learningWordWeightMax, sortWordsByWeight } from "../learningSort";
-import { hiraganaToRomanji } from "./hiragana";
+import { toHiragana, toRomaji } from "wanakana";
+
+import { HiraganaSign, hiraganaSigns } from "./hiraganaSigns";
+import { Sentence, makeSentence } from "../../Sentence";
+import { Word } from "../../Word";
+
+import {
+  learningWordWeightMax,
+  sortWordsByWeight,
+} from "../../../utils/learningSort";
+import { Result } from "../../../types/Result";
+import { shuffle } from "../../../utils/array";
+
+export const hiraganaToRomajiMap: Record<HiraganaSign, string> = {
+  あ: "a",
+  い: "i",
+  う: "u",
+  え: "e",
+  お: "o",
+  か: "ka",
+  き: "ki",
+  く: "ku",
+  け: "ke",
+  こ: "ko",
+  さ: "sa",
+  し: "shi",
+  す: "su",
+  せ: "se",
+  そ: "so",
+  た: "ta",
+  ち: "chi",
+  つ: "tsu",
+  て: "te",
+  と: "to",
+  な: "na",
+  に: "ni",
+  ぬ: "nu",
+  ね: "ne",
+  の: "no",
+  は: "ha",
+  ひ: "hi",
+  ふ: "fu",
+  へ: "he",
+  ほ: "ho",
+  ま: "ma",
+  み: "mi",
+  む: "mu",
+  め: "me",
+  も: "mo",
+  や: "ya",
+  ゆ: "yu",
+  よ: "yo",
+  ら: "ra",
+  り: "ri",
+  る: "ru",
+  れ: "re",
+  ろ: "ro",
+  わ: "wa",
+  を: "wo",
+  ん: "n",
+  が: "ga",
+  ぎ: "gi",
+  ぐ: "gu",
+  げ: "ge",
+  ご: "go",
+  ざ: "za",
+  じ: "ji",
+  ず: "zu",
+  ぜ: "ze",
+  ぞ: "zo",
+  だ: "da",
+  ぢ: "ji",
+  づ: "zu",
+  で: "de",
+  ど: "do",
+  ば: "ba",
+  び: "bi",
+  ぶ: "bu",
+  べ: "be",
+  ぼ: "bo",
+  ぱ: "pa",
+  ぴ: "pi",
+  ぷ: "pu",
+  ぺ: "pe",
+  ぽ: "po",
+} as const;
+
+/**
+ * this is not reliable
+ */
+const wordFromHiragana = (hiragana: string): Word => {
+  return {
+    chars: hiragana.split("").map((hiragana) => {
+      return {
+        display: hiragana,
+        underlyingRepresentation: toRomaji(hiragana),
+      };
+    }),
+  };
+};
+
+const wordFromRomaji = (romaji: string): Word => {
+  const hiragana = toHiragana(romaji);
+  return wordFromHiragana(hiragana);
+};
+
+export const hiraganaCharToRomaji = (char: string) => {
+  const hiraganaSign = hiraganaSigns.find((sign) => sign === char);
+  if (!hiraganaSign) return "";
+  return hiraganaToRomajiMap[char as HiraganaSign];
+};
 
 export const getRandomSentence = (
   length: number,
@@ -12,7 +117,7 @@ export const getRandomSentence = (
 ): Result<Sentence, string> => {
   const localFrequencies = { ...frequencies };
 
-  const allowedWords = shuffle(
+  const allowedWords: DBWord[] = shuffle(
     DBWords.filter((word) => {
       if (!allowedChars) return true;
       const chars = word.hiragana.split("");
@@ -66,7 +171,7 @@ export const getRandomSentence = (
 
 const isDBWordValid = (dbWord: DBWord) => {
   const word = DBWordToWord(dbWord);
-  const hiraganaString = wordToStringHiragana(word);
+  const hiraganaString = word.chars.map((char) => char.display).join("");
   return hiraganaString === dbWord.hiragana;
 };
 
@@ -3587,7 +3692,7 @@ const DBWords: DBWord[] = [
   },
 ]
   .concat(
-    Object.entries(hiraganaToRomanji).map(([hiragana, romaji]) => ({
+    Object.entries(hiraganaToRomajiMap).map(([hiragana, romaji]) => ({
       hiragana,
       romaji,
       wholeText: `${hiragana}、${romaji} - ${romaji} - ${hiragana}`,

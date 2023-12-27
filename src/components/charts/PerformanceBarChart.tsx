@@ -4,14 +4,14 @@ import {
   CharPerformanceHistory,
   charPerformanceHistoryChronologicalToCharPerformanceObject,
 } from "../../models/CharPerformance";
-import { AvailableDisplaySignSystems } from "../../models/Options";
 import { scan } from "../../utils/array";
 import { BiPause, BiPlay } from "react-icons/bi";
+import { AllSignSystems } from "../../models/signSystems/types";
 
 export const PerformanceBarChart = ({
   chronologicalCharPerformanceHistories,
 }: {
-  chronologicalCharPerformanceHistories: CharPerformanceHistory[AvailableDisplaySignSystems][number][];
+  chronologicalCharPerformanceHistories: CharPerformanceHistory[AllSignSystems][number][];
 }) => {
   const [currentHistoryPoint, setCurrentHistoryPoint] = useState(
     chronologicalCharPerformanceHistories.length,

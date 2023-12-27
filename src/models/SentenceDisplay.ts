@@ -7,7 +7,6 @@ export type CharDisplay = {
   isCorrect: boolean;
   isWrong: boolean;
   isActive: boolean;
-  showRomaji: boolean;
   isAdditional: boolean;
   underlying?: string;
   showUnderlying?: boolean;
@@ -25,7 +24,9 @@ export type SentenceDisplay = {
   finished: boolean;
 };
 
-export const sentenceDisplayFromSentenceModel = (sentenceModel: Sentence) => {
+export const sentenceDisplayFromSentenceModel = (
+  sentenceModel: Sentence,
+): SentenceDisplay => {
   return {
     words: sentenceModel.words.map((word) => {
       return {
@@ -35,7 +36,6 @@ export const sentenceDisplayFromSentenceModel = (sentenceModel: Sentence) => {
             isWrong: false,
             isCorrect: false,
             isActive: false,
-            showRomaji: false,
             isAdditional: false,
             underlying: undefined,
             showUnderlying: false,
@@ -66,7 +66,6 @@ export const sentenceDisplayFromSentenceConsumer = (
             isCorrect:
               charState.kind === "finished" && charState.type === "correct",
             isActive: charState.kind === "active",
-            showRomaji: false,
             isAdditional: false,
             underlying: charConsumer.toString(),
             showUnderlying: false,

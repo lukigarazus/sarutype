@@ -3,8 +3,8 @@ import { CharConsumer, WordConsumer } from "../models/SentenceConsumer";
 describe("CharConsumer", () => {
   it("should consume a character and be finished", () => {
     const consumer = new CharConsumer({
-      romaji: "a",
-      hiragana: "",
+      underlyingRepresentation: "a",
+      display: "",
     });
     consumer.consumeChangeEvent({
       char: "a",
@@ -18,8 +18,8 @@ describe("CharConsumer", () => {
   });
   it("should consume a wrong character and be finished", () => {
     const consumer = new CharConsumer({
-      romaji: "a",
-      hiragana: "",
+      underlyingRepresentation: "a",
+      display: "",
     });
     consumer.consumeChangeEvent({
       char: "b",
@@ -33,8 +33,8 @@ describe("CharConsumer", () => {
   });
   it("should throw error on additional character", () => {
     const consumer = new CharConsumer({
-      romaji: "a",
-      hiragana: "",
+      underlyingRepresentation: "a",
+      display: "",
     });
     const consumeResult = consumer.consumeChangeEvent({
       char: "a",
@@ -54,8 +54,8 @@ describe("CharConsumer", () => {
   });
   it("should handle remove on finished", () => {
     const consumer = new CharConsumer({
-      romaji: "a",
-      hiragana: "",
+      underlyingRepresentation: "a",
+      display: "",
     });
     const res = consumer.consumeChangeEvent({
       char: "a",
@@ -77,8 +77,8 @@ describe("CharConsumer", () => {
   });
   it("should handle remove from empty", () => {
     const consumer = new CharConsumer({
-      romaji: "a",
-      hiragana: "",
+      underlyingRepresentation: "a",
+      display: "",
     });
     consumer.focus();
     expect(
@@ -95,8 +95,8 @@ describe("CharConsumer", () => {
   });
   it("should handle remove on active", () => {
     const consumer = new CharConsumer({
-      romaji: "aa",
-      hiragana: "",
+      underlyingRepresentation: "aa",
+      display: "",
     });
     consumer.focus();
     consumer.consumeChangeEvent({
@@ -120,12 +120,12 @@ describe("CharConsumer", () => {
 
 describe("WordConsumer", () => {
   const char1 = {
-    romaji: "re",
-    hiragana: "",
+    underlyingRepresentation: "re",
+    display: "",
   };
   const char2 = {
-    romaji: "su",
-    hiragana: "",
+    underlyingRepresentation: "su",
+    display: "",
   };
   const wordConsumer = new WordConsumer({
     chars: [char1, char2],

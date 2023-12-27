@@ -12,8 +12,9 @@ import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   Sentence,
+  reverseSentence,
   sentenceConsumerFromSentence,
-  sentenceToStringRomaji,
+  sentenceToStringUnderlyingRepresentation,
 } from "../models/Sentence";
 import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
@@ -25,6 +26,7 @@ import {
   sentenceConsumerToCharPerformance,
 } from "../models/CharPerformance";
 import { useCharPerformanceHistory } from "./CharPerformanceHistoryContext";
+import { mapResult } from "../types/Result";
 
 const TestSentenceComponent = ({
   sentence,
@@ -86,7 +88,7 @@ const TestSentenceComponent = ({
   ]);
 
   const sentenceKey = useMemo(
-    () => sentenceToStringRomaji(sentence),
+    () => sentenceToStringUnderlyingRepresentation(sentence),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sentenceDisplay],
   );
@@ -251,22 +253,30 @@ const TestComponentInner = ({
 }) => {
   const { options } = useOptions();
 
-  const [sentence, setSentence] = useState(
-    options.displaySignSystem.getRandomSentence(
+  const getNewSentence = useCallback(() => {
+    let newSentence = options.displaySignSystem.getRandomSentence(
       options.numberOfWordsPerTest,
       options.displaySignSystem.allowedDisplaySigns,
       frequencies,
-    ),
-  );
+    );
+
+    if (options.reverseSignSystems) {
+      newSentence = mapResult(newSentence, reverseSentence);
+    }
+
+    return newSentence;
+  }, [
+    options.displaySignSystem,
+    options.numberOfWordsPerTest,
+    options.reverseSignSystems,
+    frequencies,
+  ]);
+
+  const [sentence, setSentence] = useState(getNewSentence());
 
   const reset = () => {
-    setSentence(
-      options.displaySignSystem.getRandomSentence(
-        options.numberOfWordsPerTest,
-        options.displaySignSystem.allowedDisplaySigns,
-        frequencies,
-      ),
-    );
+    const newSentence = getNewSentence();
+    setSentence(newSentence);
   };
 
   return sentence.kind === "error" ? (

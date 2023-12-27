@@ -135,9 +135,9 @@ describe("SentenceDisplay", () => {
         words: [
           {
             chars: [
-              { hiragana: "", romaji: "ni" },
-              { hiragana: "", romaji: "ke" },
-              { hiragana: "", romaji: "te" },
+              { display: "", underlyingRepresentation: "ni" },
+              { display: "", underlyingRepresentation: "ke" },
+              { display: "", underlyingRepresentation: "te" },
             ],
           },
         ],
@@ -147,27 +147,24 @@ describe("SentenceDisplay", () => {
           {
             chars: [
               {
-                char: { hiragana: "", romaji: "ni" },
+                char: { display: "", underlyingRepresentation: "ni" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "ke" },
+                char: { display: "", underlyingRepresentation: "ke" },
                 isCorrect: false,
                 isWrong: false,
                 isActive: true,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "te" },
+                char: { display: "", underlyingRepresentation: "te" },
                 isCorrect: false,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
             ],
@@ -187,9 +184,9 @@ describe("SentenceDisplay", () => {
         words: [
           {
             chars: [
-              { hiragana: "", romaji: "ni" },
-              { hiragana: "", romaji: "ke" },
-              { hiragana: "", romaji: "te" },
+              { display: "", underlyingRepresentation: "ni" },
+              { display: "", underlyingRepresentation: "ke" },
+              { display: "", underlyingRepresentation: "te" },
             ],
           },
         ],
@@ -199,27 +196,24 @@ describe("SentenceDisplay", () => {
           {
             chars: [
               {
-                char: { hiragana: "", romaji: "ni" },
+                char: { display: "", underlyingRepresentation: "ni" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "ke" },
+                char: { display: "", underlyingRepresentation: "ke" },
                 isCorrect: false,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "te" },
+                char: { display: "", underlyingRepresentation: "te" },
                 isCorrect: false,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
             ],
@@ -240,9 +234,9 @@ describe("SentenceDisplay", () => {
         words: [
           {
             chars: [
-              { hiragana: "", romaji: "ni" },
-              { hiragana: "", romaji: "ke" },
-              { hiragana: "", romaji: "te" },
+              { display: "", underlyingRepresentation: "ni" },
+              { display: "", underlyingRepresentation: "ke" },
+              { display: "", underlyingRepresentation: "te" },
             ],
           },
         ],
@@ -252,27 +246,24 @@ describe("SentenceDisplay", () => {
           {
             chars: [
               {
-                char: { hiragana: "", romaji: "ni" },
+                char: { display: "", underlyingRepresentation: "ni" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "ke" },
+                char: { display: "", underlyingRepresentation: "ke" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "te" },
+                char: { display: "", underlyingRepresentation: "te" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
             ],
@@ -293,9 +284,9 @@ describe("SentenceDisplay", () => {
         words: [
           {
             chars: [
-              { hiragana: "", romaji: "ni" },
-              { hiragana: "", romaji: "ke" },
-              { hiragana: "", romaji: "te" },
+              { display: "", underlyingRepresentation: "ni" },
+              { display: "", underlyingRepresentation: "ke" },
+              { display: "", underlyingRepresentation: "te" },
             ],
           },
         ],
@@ -305,35 +296,31 @@ describe("SentenceDisplay", () => {
           {
             chars: [
               {
-                char: { hiragana: "", romaji: "ni" },
+                char: { display: "", underlyingRepresentation: "ni" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "ke" },
+                char: { display: "", underlyingRepresentation: "ke" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "", romaji: "te" },
+                char: { display: "", underlyingRepresentation: "te" },
                 isCorrect: true,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: false,
               },
               {
-                char: { hiragana: "a", romaji: "a" },
+                char: { display: "a", underlyingRepresentation: "a" },
                 isCorrect: false,
                 isWrong: false,
                 isActive: false,
-                showRomaji: false,
                 isAdditional: true,
               },
             ],

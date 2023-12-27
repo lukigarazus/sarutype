@@ -1,31 +1,15 @@
-import { toHiragana, toRomaji } from "wanakana";
-import { Char } from "./Char";
+import { Char, reverseChar } from "./Char";
 
 export type Word = {
   chars: Char[];
 };
 
-export const wordToStringHiragana = (word: Word): string => {
-  return word.chars.map((char) => char.hiragana).join("");
+export const wordToStringUnderlyingRepresentation = (word: Word): string => {
+  return word.chars.map((char) => char.underlyingRepresentation).join("");
 };
 
-export const wordToStringRomaji = (word: Word): string => {
-  return word.chars.map((char) => char.romaji).join("");
-};
-
-// this is not reliable
-export const wordFromHiragana = (hiragana: string): Word => {
+export const reverseWord = (word: Word): Word => {
   return {
-    chars: hiragana.split("").map((hiragana) => {
-      return {
-        hiragana,
-        romaji: toRomaji(hiragana),
-      };
-    }),
+    chars: word.chars.map(reverseChar),
   };
-};
-
-export const wordFromRomaji = (romaji: string): Word => {
-  const hiragana = toHiragana(romaji);
-  return wordFromHiragana(hiragana);
 };

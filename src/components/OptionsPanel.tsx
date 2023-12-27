@@ -1,11 +1,14 @@
 import { useOptions } from "../hooks/useOptions";
 import {
-  availableDisplaySignSystems,
-  availableInputSignsystems,
   pickDisplaySignSystem,
   pickDisplaySign,
   pickInputSignSystem,
+  switchReverseSignSystems,
 } from "../models/Options";
+import {
+  allSignSystems,
+  availableSignSystemPairs,
+} from "../models/signSystems/types";
 
 export const OptionsPanel = () => {
   const { options, setOptions } = useOptions();
@@ -21,7 +24,7 @@ export const OptionsPanel = () => {
             setOptions(pickDisplaySignSystem(e.target.value, options))
           }
         >
-          {availableDisplaySignSystems.map((s) => (
+          {allSignSystems.map((s) => (
             <option key={s} value={s}>
               {s}
             </option>
@@ -37,11 +40,13 @@ export const OptionsPanel = () => {
             setOptions(pickInputSignSystem(ev.target.value, options));
           }}
         >
-          {availableInputSignsystems.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
+          {availableSignSystemPairs
+            .filter(({ display }) => display === options.displaySignSystem.kind)
+            .map(({ input }) => (
+              <option key={input} value={input}>
+                {input}
+              </option>
+            ))}
         </select>
       </div>
       <div style={{ width: "100%" }}>
@@ -93,6 +98,16 @@ export const OptionsPanel = () => {
             </div>
           ))}
         </div>
+      </div>
+      <div>
+        <label>
+          I want to reverse the sign system (type in what I want to learn)
+        </label>
+        <input
+          type="checkbox"
+          checked={options.reverseSignSystems}
+          onChange={() => setOptions(switchReverseSignSystems(options))}
+        />
       </div>
       <div>
         <label>I want to be shown a hint after _ milliseconds:</label>

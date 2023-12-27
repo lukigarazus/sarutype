@@ -94,7 +94,7 @@ export const localStoragePersistence: Persistence = {
         JSON.parse(charPerformanceHistoryFromStorage);
       return charPerformanceHistory;
     }
-    return { hiragana: {} };
+    return { hiragana: {}, roman: {} };
   },
   setCharPerformanceHistory: async (charPerformanceHistory) => {
     console.log("setCharPerformanceHistory", charPerformanceHistory);

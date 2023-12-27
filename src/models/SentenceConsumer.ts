@@ -1,6 +1,6 @@
 import { Char } from "./Char";
-import { Sentence, sentenceToStringRomaji } from "./Sentence";
-import { Word, wordToStringRomaji } from "./Word";
+import { Sentence, sentenceToStringUnderlyingRepresentation } from "./Sentence";
+import { Word, wordToStringUnderlyingRepresentation } from "./Word";
 
 type ConsumtionResult =
   | {
@@ -126,9 +126,9 @@ export class CharConsumer extends StringEntityConsumer {
 
   checkState(): StringEntityConsumerState {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
-    return stringFromEvents === this.char.romaji
+    return stringFromEvents === this.char.underlyingRepresentation
       ? { kind: "finished", type: "correct" }
-      : stringFromEvents.length >= this.char.romaji.length
+      : stringFromEvents.length >= this.char.underlyingRepresentation.length
       ? { kind: "finished", type: "incorrect" }
       : { kind: "active" };
   }
@@ -166,9 +166,10 @@ export class WordConsumer extends StringEntityConsumer {
   // this should only be called when the word is considered complete
   checkState(): StringEntityConsumerState {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
-    return stringFromEvents === wordToStringRomaji(this.word)
+    return stringFromEvents === wordToStringUnderlyingRepresentation(this.word)
       ? { kind: "finished", type: "correct" }
-      : stringFromEvents.length === wordToStringRomaji(this.word).length
+      : stringFromEvents.length ===
+        wordToStringUnderlyingRepresentation(this.word).length
       ? { kind: "finished", type: "incorrect" }
       : this.state.kind === "inactive"
       ? { kind: "inactive" }
@@ -184,7 +185,7 @@ export class WordConsumer extends StringEntityConsumer {
         : undefined,
     );
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
-    return stringFromEvents === wordToStringRomaji(this.word)
+    return stringFromEvents === wordToStringUnderlyingRepresentation(this.word)
       ? { kind: "finished", type: "correct" }
       : { kind: "finished", type: "incorrect" };
   }
@@ -294,7 +295,8 @@ export class SentenceConsumer extends StringEntityConsumer {
   // this should only be called when the sentence is considered complete
   checkState(): StringEntityConsumerState {
     const stringFromEvents = stringEntityChangeEventsToString(this.events);
-    return stringFromEvents === sentenceToStringRomaji(this.sentence)
+    return stringFromEvents ===
+      sentenceToStringUnderlyingRepresentation(this.sentence)
       ? { kind: "finished", type: "correct" }
       : { kind: "finished", type: "incorrect" };
   }
