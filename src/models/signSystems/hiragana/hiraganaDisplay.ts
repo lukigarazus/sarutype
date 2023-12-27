@@ -7,4 +7,6 @@ export const hiraganaDisplay = {
   possibleDisplaySigns: hiraganaSigns,
   getRandomSentence: getRandomSentence,
   convertToInputSigns: hiraganaCharToRomaji,
+  reversedDelimiter: "\n",
+  delimiter: " ",
 };

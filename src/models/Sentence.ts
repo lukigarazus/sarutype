@@ -21,8 +21,11 @@ export const sentenceToStringUnderlyingRepresentation = (
     .join(" ");
 };
 
-export const sentenceConsumerFromSentence = (sentence: Sentence) => {
-  return new SentenceConsumer(sentence);
+export const sentenceConsumerFromSentence = (
+  sentence: Sentence,
+  delimiter?: string,
+) => {
+  return new SentenceConsumer(sentence, delimiter);
 };
 
 export const reverseSentence = (sentence: Sentence): Sentence => {

@@ -38,7 +38,7 @@ const TestSentenceComponent = ({
   const { options } = useOptions();
   const { setCharPerformanceHistory } = useCharPerformanceHistory();
 
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resetRef = useRef<HTMLButtonElement | null>(null);
 
   useHotkeys("tab", () => {
@@ -46,8 +46,14 @@ const TestSentenceComponent = ({
   });
 
   const sentenceConsumer = useMemo(
-    () => sentenceConsumerFromSentence(sentence),
-    [sentence],
+    () =>
+      sentenceConsumerFromSentence(
+        sentence,
+        options.reverseSignSystems
+          ? options.displaySignSystem.reversedDelimiter
+          : options.displaySignSystem.delimiter,
+      ),
+    [sentence, options],
   );
   const [sentenceDisplay, setSentenceDisplay] = useState(
     sentenceDisplayFromSentenceConsumer(sentenceConsumer),
@@ -108,7 +114,7 @@ const TestSentenceComponent = ({
   const containerBorder = "1px solid black";
   return (
     <div>
-      <input
+      <textarea
         style={{
           border: "none",
           cursor: "default",
@@ -127,21 +133,34 @@ const TestSentenceComponent = ({
         autoCapitalize="off"
         spellCheck="false"
         onFocus={startTest}
-        onChange={(ev: ChangeEvent<HTMLInputElement>) => {
+        onChange={(ev: ChangeEvent<HTMLTextAreaElement>) => {
           switch (ev.nativeEvent.type) {
             case "input": {
               const nativeEvent = ev.nativeEvent as InputEvent;
-              const event =
-                nativeEvent.data === null
-                  ? ({
-                      kind: "remove",
-                      timestamp: Date.now(),
-                    } as const)
-                  : ({
-                      kind: "add",
-                      char: nativeEvent.data,
-                      timestamp: Date.now(),
-                    } as const);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              let event: any;
+              switch (nativeEvent.inputType) {
+                case "deleteContentBackward":
+                  event = {
+                    kind: "remove",
+                    timestamp: Date.now(),
+                  };
+                  break;
+                case "insertText":
+                  event = {
+                    kind: "add",
+                    char: nativeEvent.data,
+                    timestamp: Date.now(),
+                  };
+                  break;
+                case "insertLineBreak":
+                  event = {
+                    kind: "add",
+                    char: "\n",
+                    timestamp: Date.now(),
+                  };
+                  break;
+              }
               if (sentenceConsumer.state.kind !== "finished") {
                 sentenceConsumer.consumeChangeEvent(event);
                 refresh();

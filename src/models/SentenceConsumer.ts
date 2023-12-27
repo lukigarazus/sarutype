@@ -69,7 +69,6 @@ export abstract class StringEntityConsumer {
     return stringEntityChangeEventsToString(this.events);
   }
   public focus() {
-    console.log("CharConsumer focus");
     this.state = { kind: "active" };
     this.events.push({
       kind: "focus",
@@ -89,8 +88,11 @@ export abstract class StringEntityConsumer {
 
   abstract checkState(): StringEntityConsumerState;
 
-  consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
-    console.log("CharConsumer consumeChangeEvent", event);
+  consumeChangeEvent(
+    event: StringEntityChangeEvent,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    _delimiter?: string,
+  ): ConsumtionResult {
     switch (event.kind) {
       case "add": {
         if (this.state.kind === "finished") {
@@ -225,13 +227,16 @@ export class WordConsumer extends StringEntityConsumer {
     }
   }
 
-  consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
-    console.log("WordConsumer consumeChangeEvent", event);
+  consumeChangeEvent(
+    event: StringEntityChangeEvent,
+    delimiter: string = " ",
+  ): ConsumtionResult {
+    console.log("consumeChangeEvent", event, delimiter);
     const wordString = stringEntityChangeEventsToString(this.events);
     switch (event.kind) {
       case "add":
         switch (event.char) {
-          case " ":
+          case delimiter:
             switch (wordString) {
               // ignore leading spaces
               case "":
@@ -275,7 +280,10 @@ export class WordConsumer extends StringEntityConsumer {
 export class SentenceConsumer extends StringEntityConsumer {
   public wordConsumers: WordConsumer[] = [];
 
-  constructor(public sentence: Sentence) {
+  constructor(
+    public sentence: Sentence,
+    public delimiter: string = " ",
+  ) {
     super();
     this.wordConsumers = sentence.words.map((word) => new WordConsumer(word));
   }
@@ -315,11 +323,14 @@ export class SentenceConsumer extends StringEntityConsumer {
   finalize(sendSpace = true): void {
     const lastWordConsumer = this.wordConsumers[this.wordConsumers.length - 1];
     if (sendSpace)
-      lastWordConsumer.consumeChangeEvent({
-        kind: "add",
-        char: " ",
-        timestamp: Date.now(),
-      });
+      lastWordConsumer.consumeChangeEvent(
+        {
+          kind: "add",
+          char: " ",
+          timestamp: Date.now(),
+        },
+        this.delimiter,
+      );
     const isIncorrect = this.wordConsumers.some((wordConsumer) => {
       const state = wordConsumer.state;
       return state.kind === "finished" && state.type === "incorrect";
@@ -341,14 +352,15 @@ export class SentenceConsumer extends StringEntityConsumer {
   private pipeEventToWordConsumers(
     event: StringEntityChangeEvent,
   ): ConsumtionResult {
-    console.log("SentenceConsumer pipeEventToWordConsumers");
     const currentWordConsumerIndex = this.getCurrentWordConsumerIndex();
     const currentWordConsumer = this.wordConsumers[currentWordConsumerIndex];
-    console.log("currentWordConsumer", currentWordConsumer);
 
     if (!currentWordConsumer) return { kind: "go forward" };
 
-    const result = currentWordConsumer.consumeChangeEvent(event);
+    const result = currentWordConsumer.consumeChangeEvent(
+      event,
+      this.delimiter,
+    );
     switch (result.kind) {
       case "success":
         return { kind: "success", value: this.state };
@@ -371,23 +383,15 @@ export class SentenceConsumer extends StringEntityConsumer {
   }
 
   consumeChangeEvent(event: StringEntityChangeEvent): ConsumtionResult {
-    console.log("SentenceConsumer consumeChangeEvent", event);
     switch (event.kind) {
       case "add": {
-        console.log("SentenceConsumer consumeChangeEvent add");
         this.events.push(event);
         const result = this.pipeEventToWordConsumers(event);
         switch (result.kind) {
           case "success": {
             const lastWordConsumer =
               this.wordConsumers[this.wordConsumers.length - 1];
-            console.log(
-              "lastWordConsumer",
-              lastWordConsumer,
-              lastWordConsumer.checkState(),
-            );
             if (lastWordConsumer.checkState().kind === "finished") {
-              console.log("last word is finished", lastWordConsumer);
               this.finalize();
               // end sentence when the last word is finished
               // without a space
