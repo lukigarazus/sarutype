@@ -102,7 +102,7 @@ const TestSentenceComponent = ({
   }, [sentenceDisplay, checkTestEnd]);
 
   const containerHeight = 300;
-  const containerWidth = 700;
+  const containerWidth = Math.min(window.innerWidth - 20, 700);
   const containerPadding = "0.5em";
   const containerBorderRadius = "0.5em";
   const containerBorder = "1px solid black";
