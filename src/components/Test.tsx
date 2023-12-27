@@ -147,6 +147,7 @@ const TestSentenceComponent = ({
                   };
                   break;
                 case "insertText":
+                case "insertFromComposition" /* japanese handwritten input */:
                   event = {
                     kind: "add",
                     char: nativeEvent.data,
