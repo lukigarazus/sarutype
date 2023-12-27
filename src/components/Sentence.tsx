@@ -96,7 +96,7 @@ const CharComponent = ({
               color: "red",
             }}
           >
-            {char.underlyingRepresentation}
+            {underlying}
           </span>
         )}
         {bottomSlotState.kind === "active" && (
