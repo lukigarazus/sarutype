@@ -146,6 +146,7 @@ const TestSentenceComponent = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nativeEventInputData: (ev.nativeEvent as any).data,
           });
+          console.log("on test input change", ev.nativeEvent);
           switch (ev.nativeEvent.type) {
             case "input": {
               const nativeEvent = ev.nativeEvent as InputEvent;
