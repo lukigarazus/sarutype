@@ -76,19 +76,22 @@ const TestSentenceComponent = ({
       inputRef.current.blur();
       inputRef.current.value = "";
 
-      setCharPerformanceHistory((old) =>
-        charPerformanceToCharPerformanceHistory(
-          sentenceConsumerToCharPerformance(
-            sentenceConsumer,
-            options.displaySignSystem.kind,
-            // this is a hack, the first one is always a lot slower and messes up the stats
-          ).slice(1),
-          JSON.parse(JSON.stringify(old)),
-        ),
-      );
+      if (!options.reverseSignSystems) {
+        setCharPerformanceHistory((old) =>
+          charPerformanceToCharPerformanceHistory(
+            sentenceConsumerToCharPerformance(
+              sentenceConsumer,
+              options.displaySignSystem.kind,
+              // this is a hack, the first one is always a lot slower and messes up the stats
+            ).slice(1),
+            JSON.parse(JSON.stringify(old)),
+          ),
+        );
+      }
     }
   }, [
     options.displaySignSystem.kind,
+    options.reverseSignSystems,
     sentenceConsumer,
     setCharPerformanceHistory,
   ]);
@@ -162,7 +165,7 @@ const TestSentenceComponent = ({
                   };
                   break;
               }
-              if (sentenceConsumer.state.kind !== "finished") {
+              if (event && sentenceConsumer.state.kind !== "finished") {
                 sentenceConsumer.consumeChangeEvent(event);
                 refresh();
               }
