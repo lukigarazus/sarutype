@@ -12,6 +12,8 @@ export const defaultOptions = {
   displaySignSystem: hiraganaDisplay,
 
   reverseSignSystems: false,
+
+  showLog: false,
 };
 
 export type Options = typeof defaultOptions;

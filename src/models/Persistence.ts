@@ -25,6 +25,7 @@ type PersistedOptions = {
     allowedDisplaySigns: string[];
   };
   reverseSignSystems: boolean;
+  showLog: boolean;
 };
 
 const optionsToPersistedOptions = (options: Options): PersistedOptions => {
@@ -39,6 +40,7 @@ const optionsToPersistedOptions = (options: Options): PersistedOptions => {
       ),
     },
     reverseSignSystems: options.reverseSignSystems,
+    showLog: options.showLog,
   };
 };
 
@@ -70,7 +72,11 @@ const persistedOptionsToOptions = (options: PersistedOptions): Options => {
     ...withNumberOfWords,
     reverseSignSystems: options.reverseSignSystems,
   };
-  return withReverse;
+  const withLog = {
+    ...withReverse,
+    showLog: options.showLog,
+  };
+  return withLog;
 };
 
 type PersistedCharPerformanceHistory = CharPerformanceHistory;

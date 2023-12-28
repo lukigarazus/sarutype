@@ -80,6 +80,7 @@ export const Layout: ComponentType<PropsWithChildren> = ({ children }) => {
           alignItems: "center",
           width: "100%",
           height: "calc(100vh - 3em - 1em)",
+          flexDirection: "column",
         }}
       >
         {optionsLoading ? "Loading..." : children}

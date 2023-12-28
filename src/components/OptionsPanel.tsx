@@ -135,6 +135,19 @@ export const OptionsPanel = () => {
           }
         />
       </div>
+      <div>
+        <label>I want to see the event log (dev)</label>
+        <input
+          type="checkbox"
+          checked={options.showLog}
+          onChange={() =>
+            setOptions({
+              ...options,
+              showLog: !options.showLog,
+            })
+          }
+        />
+      </div>
     </div>
   );
 };

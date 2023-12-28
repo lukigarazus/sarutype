@@ -27,6 +27,7 @@ import {
 } from "../models/CharPerformance";
 import { useCharPerformanceHistory } from "./CharPerformanceHistoryContext";
 import { mapResult } from "../types/Result";
+import { useLog } from "../hooks/useLog";
 
 const TestSentenceComponent = ({
   sentence,
@@ -36,6 +37,7 @@ const TestSentenceComponent = ({
   reset: () => void;
 }) => {
   const { options } = useOptions();
+  const { push: pushToLog } = useLog();
   const { setCharPerformanceHistory } = useCharPerformanceHistory();
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
@@ -137,6 +139,13 @@ const TestSentenceComponent = ({
         spellCheck="false"
         onFocus={startTest}
         onChange={(ev: ChangeEvent<HTMLTextAreaElement>) => {
+          pushToLog("on test input change", {
+            nativeEventType: ev.nativeEvent.type,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            nativeEventInputType: (ev.nativeEvent as any).inputType,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            nativeEventInputData: (ev.nativeEvent as any).data,
+          });
           switch (ev.nativeEvent.type) {
             case "input": {
               const nativeEvent = ev.nativeEvent as InputEvent;
