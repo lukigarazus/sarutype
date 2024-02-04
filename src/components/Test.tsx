@@ -8,7 +8,6 @@ import {
   ComponentType,
   ReactElement,
 } from "react";
-import { useHotkeys } from "react-hotkeys-hook";
 
 import {
   Sentence,
@@ -29,6 +28,12 @@ import { useCharPerformanceHistory } from "./CharPerformanceHistoryContext";
 import { mapResult } from "../types/Result";
 import { useLog } from "../hooks/useLog";
 
+const containerHeight = 300;
+const containerWidth = Math.min(window.innerWidth - 20, 700);
+const containerPadding = "0.5em";
+const containerBorderRadius = "0.5em";
+const containerBorder = "1px solid black";
+
 const TestSentenceComponent = ({
   sentence,
   reset,
@@ -42,10 +47,6 @@ const TestSentenceComponent = ({
 
   const inputRef = useRef<HTMLTextAreaElement | null>(null);
   const resetRef = useRef<HTMLButtonElement | null>(null);
-
-  useHotkeys("tab", () => {
-    resetRef.current?.focus();
-  });
 
   const sentenceConsumer = useMemo(
     () =>
@@ -63,22 +64,30 @@ const TestSentenceComponent = ({
   const refresh = () => {
     setSentenceDisplay(sentenceDisplayFromSentenceConsumer(sentenceConsumer));
   };
-  const startTest = () => {
+  const [clickedAway, setClickedAway] = useState(false);
+
+  const focusTest = () => {
+    inputRef.current?.focus();
+
     if (
       sentenceConsumer.state.kind === "finished" ||
       sentenceConsumer.state.kind === "active"
     )
       return;
+
     sentenceConsumer.focus();
-    inputRef.current?.focus();
     refresh();
   };
+  const onTestBlur = () => {
+    setClickedAway(true);
+  };
+
   const checkTestEnd = useCallback(() => {
     if (inputRef.current && sentenceConsumer.state.kind === "finished") {
       inputRef.current.blur();
       inputRef.current.value = "";
 
-      if (!options.reverseSignSystems) {
+      if (!options.reverseSignSystems && !clickedAway) {
         setCharPerformanceHistory((old) =>
           charPerformanceToCharPerformanceHistory(
             sentenceConsumerToCharPerformance(
@@ -96,6 +105,7 @@ const TestSentenceComponent = ({
     options.reverseSignSystems,
     sentenceConsumer,
     setCharPerformanceHistory,
+    clickedAway,
   ]);
 
   const sentenceKey = useMemo(
@@ -112,11 +122,6 @@ const TestSentenceComponent = ({
     checkTestEnd();
   }, [sentenceDisplay, checkTestEnd]);
 
-  const containerHeight = 300;
-  const containerWidth = Math.min(window.innerWidth - 20, 700);
-  const containerPadding = "0.5em";
-  const containerBorderRadius = "0.5em";
-  const containerBorder = "1px solid black";
   return (
     <div>
       <textarea
@@ -137,7 +142,9 @@ const TestSentenceComponent = ({
         autoCorrect="off"
         autoCapitalize="off"
         spellCheck="false"
-        onFocus={startTest}
+        // this is for tabbing in and out of the test
+        onFocus={focusTest}
+        onBlur={onTestBlur}
         onChange={(ev: ChangeEvent<HTMLTextAreaElement>) => {
           pushToLog("on test input change", {
             nativeEventType: ev.nativeEvent.type,
@@ -223,7 +230,7 @@ const TestSentenceComponent = ({
             borderRadius: containerBorderRadius,
             padding: containerPadding,
           }}
-          onClick={startTest}
+          onClick={focusTest}
         >
           <SentenceComponent key={sentenceKey} sentence={sentenceDisplay} />
         </div>
