@@ -1,4 +1,4 @@
-import { SentenceConsumer } from "./SentenceConsumer";
+import { SentenceConsumer } from "../SignConsumerModels";
 import {
   Word,
   reverseWord,

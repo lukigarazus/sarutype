@@ -3,7 +3,7 @@ import {
   hiraganaSigns,
   HiraganaSign,
 } from "./signSystems/hiragana/hiraganaSigns";
-import { SentenceConsumer } from "./SentenceConsumer";
+import { SentenceConsumer } from "./SignConsumerModels";
 import { AllSignSystems } from "./signSystems/types";
 
 export type CharPerformanceState =
@@ -17,6 +17,24 @@ export type CharPerformance = {
   timestamp: number;
   signSystem: AllSignSystems;
 };
+
+export type CharPerformanceHistory = {
+  hiragana: Record<number, Record<HiraganaSign, CharPerformanceState[]>>;
+  roman: Record<number, Record<string, CharPerformanceState[]>>;
+};
+
+export type PerformanceObject = {
+  total: number;
+  correct: number;
+  wrong: number;
+  times: number[];
+};
+
+export type CharPerformanceObject = {
+  char: string;
+  averageTime: number;
+  errorRate: number;
+} & PerformanceObject;
 
 export const sentenceConsumerToCharPerformance = (
   sentenceConsumer: SentenceConsumer,
@@ -43,11 +61,6 @@ export const sentenceConsumerToCharPerformance = (
   );
 
   return charPerformanceObjects;
-};
-
-export type CharPerformanceHistory = {
-  hiragana: Record<number, Record<HiraganaSign, CharPerformanceState[]>>;
-  roman: Record<number, Record<string, CharPerformanceState[]>>;
 };
 
 export const charPerformanceToCharPerformanceHistory = (
@@ -93,19 +106,6 @@ export const charPerformanceHistoryToChronologicalCharPerformanceHistory = (
     value: chronologicalCharPerformanceHistories,
   };
 };
-
-export type PerformanceObject = {
-  total: number;
-  correct: number;
-  wrong: number;
-  times: number[];
-};
-
-export type CharPerformanceObject = {
-  char: string;
-  averageTime: number;
-  errorRate: number;
-} & PerformanceObject;
 
 export const charPerformanceHistoryChronologicalToCharPerformanceObject = (
   charPerformanceHistoryEntry: CharPerformanceHistory[AllSignSystems],

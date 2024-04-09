@@ -1,7 +1,7 @@
 import { ComponentType, PropsWithChildren } from "react";
 import { BsFillKeyboardFill } from "react-icons/bs";
 import { BiSolidCog } from "react-icons/bi";
-import { IoMdStats } from "react-icons/io";
+import { IoMdStats, IoMdBook } from "react-icons/io";
 import { useOptions } from "../hooks/useOptions";
 import { Link } from "react-router-dom";
 
@@ -23,6 +23,12 @@ const navigationElements = [
     icon: BiSolidCog,
     path: "/sarutype/options",
     title: "Options",
+  },
+  {
+    name: "Memorize",
+    icon: IoMdBook,
+    path: "/sarutype/memorize",
+    title: "Memorize",
   },
 ];
 

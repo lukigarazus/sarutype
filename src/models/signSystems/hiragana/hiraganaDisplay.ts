@@ -1,5 +1,6 @@
 import { HiraganaSign, hiraganaSigns } from "./hiraganaSigns";
-import { getRandomSentence, hiraganaCharToRomaji } from "./hiraganaToRomaji";
+import { hiraganaCharToRomaji } from "./hiraganaToRomaji";
+import { getRandomSentence } from "./hiraganaRandomSentence";
 
 export const hiraganaDisplay = {
   kind: "hiragana" as const,
@@ -7,6 +8,6 @@ export const hiraganaDisplay = {
   possibleDisplaySigns: hiraganaSigns,
   getRandomSentence: getRandomSentence,
   convertToInputSigns: hiraganaCharToRomaji,
-  reversedDelimiter: "\n",
-  delimiter: " ",
+  reversedWordDelimiter: "\n",
+  wordDelimiter: " ",
 };

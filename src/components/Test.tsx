@@ -14,7 +14,7 @@ import {
   reverseSentence,
   sentenceConsumerFromSentence,
   sentenceToStringUnderlyingRepresentation,
-} from "../models/Sentence";
+} from "../models/SignModels/Sentence";
 import { SentenceComponent } from "./Sentence";
 import { sentenceDisplayFromSentenceConsumer } from "../models/SentenceDisplay";
 import { useOptions } from "../hooks/useOptions";
@@ -53,8 +53,8 @@ const TestSentenceComponent = ({
       sentenceConsumerFromSentence(
         sentence,
         options.reverseSignSystems
-          ? options.displaySignSystem.reversedDelimiter
-          : options.displaySignSystem.delimiter,
+          ? options.displaySignSystem.reversedWordDelimiter
+          : options.displaySignSystem.wordDelimiter,
       ),
     [sentence, options],
   );
@@ -153,7 +153,6 @@ const TestSentenceComponent = ({
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             nativeEventInputData: (ev.nativeEvent as any).data,
           });
-          console.log("on test input change", ev.nativeEvent);
           switch (ev.nativeEvent.type) {
             case "input": {
               const nativeEvent = ev.nativeEvent as InputEvent;
@@ -281,7 +280,6 @@ const FrequenciesWrapper: ComponentType<{
       return {};
     }
   }, [status, options.displaySignSystem.kind]);
-  console.log(frequencies);
 
   return <>{frequencies ? children(frequencies) : null}</>;
 };

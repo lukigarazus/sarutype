@@ -1,5 +1,5 @@
 import {} from "../models/SentenceDisplay.ts";
-import { Sentence } from "../models/Sentence.ts";
+import { Sentence } from "../models/SignModels/Sentence.ts";
 import { SentenceDisplay } from "../models/SentenceDisplay.ts";
 
 /*const testCases: Dupa[] = [

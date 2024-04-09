@@ -1,6 +1,6 @@
-import { SentenceConsumer } from "./SentenceConsumer";
-import { Char } from "./Char";
-import { Sentence } from "./Sentence";
+import { SentenceConsumer } from "./SignConsumerModels";
+import { Char } from "./SignModels/Char";
+import { Sentence } from "./SignModels/Sentence";
 
 export type CharDisplay = {
   char: Char;

@@ -1,0 +1,1 @@
+export { SentenceConsumer } from "./SentenceConsumer";
