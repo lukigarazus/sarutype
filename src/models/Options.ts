@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { hiraganaDisplay } from "./signSystems/hiragana/hiraganaDisplay";
-import { AllSignSystems, allSignSystems } from "./signSystems/types";
+import { katakanaDisplay } from "./signSystems/katakana/katakanaDisplay";
+import {
+  AllSignSystems,
+  allSignSystems,
+  AllSignSystemDisplays,
+} from "./signSystems/types";
 
 export const defaultOptions = {
   showTransliterationTimeout: 5000,
@@ -9,7 +14,7 @@ export const defaultOptions = {
 
   inputSignSystem: "roman" as AllSignSystems,
 
-  displaySignSystem: hiraganaDisplay,
+  displaySignSystem: hiraganaDisplay as AllSignSystemDisplays,
 
   reverseSignSystems: false,
 
@@ -31,6 +36,9 @@ export const pickDisplaySignSystem = (signSystem: string, options: Options) => {
   if (signSystem === "hiragana") {
     newOptions.displaySignSystem = hiraganaDisplay;
   }
+  if (signSystem === "katakana") {
+    newOptions.displaySignSystem = katakanaDisplay;
+  }
   return newOptions;
 };
 
@@ -41,12 +49,10 @@ export const pickDisplaySign = (
   const newOptions = { ...options };
   switch (event.kind) {
     case "add":
-      newOptions.displaySignSystem.allowedDisplaySigns.add(event.sign as any);
+      newOptions.displaySignSystem.allowedDisplaySigns.add(event.sign);
       break;
     case "remove":
-      newOptions.displaySignSystem.allowedDisplaySigns.delete(
-        event.sign as any,
-      );
+      newOptions.displaySignSystem.allowedDisplaySigns.delete(event.sign);
       break;
   }
   return newOptions;

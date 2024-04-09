@@ -49,7 +49,6 @@ export const CharPerformanceHistoryProvider = ({
         setStatus((prev) =>
           mapAsyncResult(prev, (prevValue) => {
             const newValue = charPerformanceHistoryHandler(prevValue);
-            console.log("setting char performance history", newValue);
             persistence.setCharPerformanceHistory(newValue);
             return okAsyncResult(newValue);
           }),
@@ -60,7 +59,6 @@ export const CharPerformanceHistoryProvider = ({
 
       if (!charPerformanceHistory) return;
 
-      console.log("setting char performance history", charPerformanceHistory);
       persistence.setCharPerformanceHistory(charPerformanceHistory);
       setStatus(okAsyncResult(charPerformanceHistory));
     },
@@ -74,9 +72,7 @@ export const CharPerformanceHistoryProvider = ({
         (await persistence.getCharPerformanceHistory()) || { hiragana: {} };
       setStatus(okAsyncResult(charPerformanceHistory));
     };
-    load()
-      .then(console.log)
-      .catch((err) => setStatus({ kind: "error", error: err }));
+    load().catch((err) => setStatus({ kind: "error", error: err }));
   }, [persistence]);
 
   const value = useMemo(

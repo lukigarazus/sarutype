@@ -5,6 +5,11 @@ import {
 } from "./signSystems/hiragana/hiraganaSigns";
 import { SentenceConsumer } from "./SignConsumerModels";
 import { AllSignSystems } from "./signSystems/types";
+import {
+  KatakanaSign,
+  katakanaSigns,
+} from "./signSystems/katakana/katakanaSigns";
+import { romanSigns } from "./signSystems/roman/romanSigns";
 
 export type CharPerformanceState =
   | { kind: "not finished" }
@@ -18,9 +23,12 @@ export type CharPerformance = {
   signSystem: AllSignSystems;
 };
 
+type PerformanceHistoryEntry = Record<string, CharPerformanceState[]>;
+
 export type CharPerformanceHistory = {
-  hiragana: Record<number, Record<HiraganaSign, CharPerformanceState[]>>;
-  roman: Record<number, Record<string, CharPerformanceState[]>>;
+  hiragana?: Record<number, Record<HiraganaSign, CharPerformanceState[]>>;
+  katakana?: Record<number, Record<KatakanaSign, CharPerformanceState[]>>;
+  roman?: Record<number, Record<string, CharPerformanceState[]>>;
 };
 
 export type PerformanceObject = {
@@ -35,6 +43,17 @@ export type CharPerformanceObject = {
   averageTime: number;
   errorRate: number;
 } & PerformanceObject;
+
+const getAllSignsFromSignSystem = (signSystem: AllSignSystems) => {
+  switch (signSystem) {
+    case "hiragana":
+      return hiraganaSigns;
+    case "katakana":
+      return katakanaSigns;
+    case "roman":
+      return romanSigns;
+  }
+};
 
 export const sentenceConsumerToCharPerformance = (
   sentenceConsumer: SentenceConsumer,
@@ -68,21 +87,29 @@ export const charPerformanceToCharPerformanceHistory = (
   history: CharPerformanceHistory = {
     hiragana: {},
     roman: {},
+    katakana: {},
   },
 ): CharPerformanceHistory => {
   charPerformances.forEach((charPerformance) => {
-    if (!history[charPerformance.signSystem][charPerformance.timestamp]) {
-      history[charPerformance.signSystem][charPerformance.timestamp] =
-        hiraganaSigns.reduce(
+    if (history[charPerformance.signSystem] === undefined) {
+      history[charPerformance.signSystem] = {};
+    }
+
+    if (!history[charPerformance.signSystem]?.[charPerformance.timestamp]) {
+      history[charPerformance.signSystem]![charPerformance.timestamp] =
+        getAllSignsFromSignSystem(charPerformance.signSystem).reduce(
           (acc, sign) => {
             acc[sign] = [];
             return acc;
           },
-          {} as Record<HiraganaSign, CharPerformanceState[]>,
+          {} as Record<string, CharPerformanceState[]>,
         );
     }
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     history[charPerformance.signSystem][charPerformance.timestamp][
-      charPerformance.char as HiraganaSign
+      charPerformance.char
     ].push(charPerformance.state);
   });
   return history;
@@ -91,10 +118,10 @@ export const charPerformanceToCharPerformanceHistory = (
 export const charPerformanceHistoryToChronologicalCharPerformanceHistory = (
   value: CharPerformanceHistory,
   displaySignSystem: AllSignSystems,
-): Result<CharPerformanceHistory[AllSignSystems][number][], "empty"> => {
+): Result<PerformanceHistoryEntry[], "empty"> => {
   const displaySignSystemData = value[displaySignSystem];
   const chronologicalCharPerformanceHistories = Object.entries(
-    displaySignSystemData,
+    displaySignSystemData || {},
   )
     .sort(([timestamp1], [timestamp2]) => +timestamp1 - +timestamp2)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -108,7 +135,7 @@ export const charPerformanceHistoryToChronologicalCharPerformanceHistory = (
 };
 
 export const charPerformanceHistoryChronologicalToCharPerformanceObject = (
-  charPerformanceHistoryEntry: CharPerformanceHistory[AllSignSystems],
+  charPerformanceHistoryEntry: Record<number, PerformanceHistoryEntry>,
 ) => {
   const performanceObjects: Record<string, PerformanceObject> =
     Object.fromEntries(
@@ -145,7 +172,7 @@ export const charPerformanceHistoryChronologicalToCharPerformanceObject = (
 };
 
 export const charPerformanceHistoryChronologicalToFrequencyObject = (
-  charPerformanceHistoryChronological: CharPerformanceHistory[AllSignSystems][number][],
+  charPerformanceHistoryChronological: PerformanceHistoryEntry[],
 ) => {
   return charPerformanceHistoryChronological.reduce(
     (acc, performance) => {

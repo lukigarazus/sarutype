@@ -133,7 +133,6 @@ describe("ParserConsumer", () => {
   test("should work with break in the middle of a char", () => {
     const result = parser.parse(stringSentence.slice(0, 1));
     if (result.status === false) {
-      console.log(result);
       expect.fail("Parser failed");
     }
     expect(result.value.parsedValue).toEqual(stringSentence.slice(0, 1));
@@ -144,9 +143,6 @@ describe("ParserConsumer", () => {
       FC.property(FC.integer({ min: 0, max: stringSentence.length }), (end) => {
         const result = parser.parse(stringSentence.slice(0, end));
         if (result.status === false) {
-          console.log(stringSentence);
-          console.log(stringSentence.slice(0, end));
-          console.log(result);
           expect.fail("Parser failed");
         } else {
           expect(result.value.parsedValue).toEqual(
