@@ -76,7 +76,9 @@ export const OptionsPanel = () => {
                 id={s}
                 type="checkbox"
                 value={s}
-                checked={options.displaySignSystem.allowedDisplaySigns.has(s)}
+                checked={(
+                  options.displaySignSystem.allowedDisplaySigns as Set<string>
+                ).has(s)}
                 onChange={(ev) => {
                   const selected = ev.target.checked;
                   const value = ev.target.value;
@@ -93,7 +95,9 @@ export const OptionsPanel = () => {
               />
               <label htmlFor={s}>{s}</label>
               <label htmlFor={s}>
-                {options.displaySignSystem.convertToInputSigns(s)}
+                {options.displaySignSystem.convertToInputSigns(
+                  s as unknown as string,
+                )}
               </label>
             </div>
           ))}

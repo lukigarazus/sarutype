@@ -10,6 +10,11 @@
     "preview": "vite preview",
     "test": "vitest"
   },
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "off"
+    }
+  },
   "dependencies": {
     "deep-object-diff": "^1.1.9",
     "diff": "^5.1.0",

@@ -1,4 +1,4 @@
-import { CharConsumer, WordConsumer } from "../models/SentenceConsumer";
+import { CharConsumer, WordConsumer } from "../models/SignConsumerModels";
 
 describe("CharConsumer", () => {
   it("should consume a character and be finished", () => {
