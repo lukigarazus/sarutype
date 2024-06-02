@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     },
   },
   {
-    path: "/sarutype/memorize",
+    path: "/sarutype/memorizer",
     lazy: async () => {
       const Component = (await import("./pages/Memorize")).default;
       return { Component };
