@@ -49,9 +49,11 @@ export const pickDisplaySign = (
   const newOptions = { ...options };
   switch (event.kind) {
     case "add":
+      // @ts-expect-error error
       newOptions.displaySignSystem.allowedDisplaySigns.add(event.sign);
       break;
     case "remove":
+      // @ts-expect-error error
       newOptions.displaySignSystem.allowedDisplaySigns.delete(event.sign);
       break;
   }

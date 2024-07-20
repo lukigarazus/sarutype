@@ -63,7 +63,7 @@ export const OptionsPanel = () => {
             flexWrap: "wrap",
           }}
         >
-          {options.displaySignSystem.possibleDisplaySigns.map((s) => (
+          {options.displaySignSystem.possibleDisplaySigns.map((s, i) => (
             <div
               key={s}
               style={{
@@ -80,16 +80,30 @@ export const OptionsPanel = () => {
                   options.displaySignSystem.allowedDisplaySigns as Set<string>
                 ).has(s)}
                 onChange={(ev) => {
+                  console.log(ev);
+                  // @ts-expect-error error
+                  const isShiftClicked = ev.nativeEvent.shiftKey;
                   const selected = ev.target.checked;
-                  const value = ev.target.value;
                   setOptions(
-                    pickDisplaySign(
-                      {
-                        kind: selected ? "add" : "remove",
-                        sign: value,
-                      },
-                      options,
-                    ),
+                    isShiftClicked
+                      ? options.displaySignSystem.possibleDisplaySigns
+                          .slice(0, i + 1)
+                          .reduce((acc, el) => {
+                            return pickDisplaySign(
+                              {
+                                kind: selected ? "add" : "remove",
+                                sign: el,
+                              },
+                              acc,
+                            );
+                          }, options)
+                      : pickDisplaySign(
+                          {
+                            kind: selected ? "add" : "remove",
+                            sign: s,
+                          },
+                          options,
+                        ),
                   );
                 }}
               />
