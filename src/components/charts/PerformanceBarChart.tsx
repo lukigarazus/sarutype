@@ -8,10 +8,14 @@ import { scan } from "../../utils/array";
 import { BiPause, BiPlay } from "react-icons/bi";
 import { AllSignSystems } from "../../models/signSystems/types";
 
+type RemoveUndefined<T> = T extends undefined ? never : T;
+
+type History = RemoveUndefined<CharPerformanceHistory[AllSignSystems]>;
+
 export const PerformanceBarChart = ({
   chronologicalCharPerformanceHistories,
 }: {
-  chronologicalCharPerformanceHistories: CharPerformanceHistory[AllSignSystems][number][];
+  chronologicalCharPerformanceHistories: History[number][];
 }) => {
   const [currentHistoryPoint, setCurrentHistoryPoint] = useState(
     chronologicalCharPerformanceHistories.length,

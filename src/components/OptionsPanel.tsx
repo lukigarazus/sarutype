@@ -96,6 +96,7 @@ export const OptionsPanel = () => {
               <label htmlFor={s}>{s}</label>
               <label htmlFor={s}>
                 {options.displaySignSystem.convertToInputSigns(
+                  // @ts-expect-error string
                   s as unknown as string,
                 )}
               </label>

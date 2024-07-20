@@ -1,5 +1,6 @@
 import { Layout } from "./Layout";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const song = `このおもいを けしてしまうには
 まだ
 `;
